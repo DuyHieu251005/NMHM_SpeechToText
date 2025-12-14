@@ -1,0 +1,10 @@
+*.tex.bbl
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.out
+*.xml
+*.toc
+*blx.bib

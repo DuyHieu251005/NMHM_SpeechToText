@@ -1,0 +1,96 @@
+\chapter{Lựa chọn Mô hình và Kiến trúc}
+
+\section{Mô hình sử dụng}
+\begin{itemize}
+    \item OpenAI Whisper
+    \item PhoWhisper
+    \item Wav2Vec2
+\end{itemize}
+
+\section{Lí do lựa chọn}
+\subsubsection{OpenAI Whisper}
+Đại diện cho SOTA (State-of-the-art) và Tính Đa Nhiệm. Đây là mô hình "Baseline" (cơ sở) mạnh mẽ nhất hiện nay để so sánh.
+\begin{itemize}
+    \item Kiến trúc Transformer quy mô lớn: Whisper sử dụng kiến trúc Encoder-Decoder (Seq2Seq) được huấn luyện trên 680.000 giờ dữ liệu đa ngôn ngữ. Chọn Whisper cho phép bạn tiếp cận công nghệ tiên tiến nhất hiện nay.
+    \item Khả năng Robustness (Chống nhiễu): Không giống các mô hình cũ, Whisper cực kỳ mạnh mẽ trong việc xử lý âm thanh nhiễu, giọng địa phương và ngữ điệu tự nhiên mà không cần tiền xử lý quá phức tạp.
+    \item Zero-shot Learning: Chọn Whisper để kiểm chứng khả năng nhận dạng tiếng Việt của một mô hình đa ngôn ngữ (Multilingual) mà không cần fine-tune lại xem hiệu suất gốc của nó tốt đến mức nào.
+\end{itemize}
+
+\subsection{PhoWhisper}
+Đại diện cho sự "Thích nghi ngôn ngữ" (Language Adaptation). Đây là phiên bản cải tiến chuyên biệt, chứng minh tầm quan trọng của việc tối ưu hóa cho tiếng Việt.
+\begin{itemize}
+    \item Fine-tuning cho tiếng Việt: PhoWhisper là phiên bản Whisper được fine-tune trên tập dữ liệu tiếng Việt lớn. Lý do chọn nó là để chứng minh giả thuyết: "Một mô hình lớn đa ngôn ngữ (Whisper) sẽ hoạt động tốt hơn nếu được tinh chỉnh sâu trên dữ liệu bản địa."
+    \item Khắc phục nhược điểm của Whisper gốc: Whisper gốc đôi khi gặp lỗi về dấu câu hoặc từ vựng đặc thù của Việt Nam. PhoWhisper giải quyết vấn đề này. Chọn mô hình này giúp đồ án của bạn có tính ứng dụng thực tế cao hơn tại Việt Nam.
+\end{itemize}
+
+\subsection{Wav2Vec2}
+Đại diện cho Kiến trúc Self-Supervised Learning (SSL). Đây là đối trọng về mặt kiến trúc và hiệu suất tính toán.
+\begin{itemize}
+    \item Sự khác biệt về kiến trúc (Encoder-only vs Encoder-Decoder): Trong khi Whisper là Encoder-Decoder, Wav2Vec2 sử dụng cơ chế CTC (Connectionist Temporal Classification) và Self-Supervised Learning. Việc chọn Wav2Vec2 giúp đồ án có sự so sánh đa dạng về mặt kỹ thuật chứ không chỉ so sánh các biến thể của cùng một mô hình.
+    \item Tối ưu tài nguyên và tốc độ: Wav2Vec2 thường nhẹ hơn và có độ trễ (latency) thấp hơn Whisper trong suy luận (inference). Đây là lựa chọn lý tưởng để so sánh về khía cạnh hiệu năng triển khai (Deployment efficiency) trên các thiết bị giới hạn tài nguyên.
+    \item Tiền thân của công nghệ ASR hiện đại: Trước khi Whisper ra mắt, Wav2Vec2 là chuẩn mực (SOTA). Việc đưa nó vào giúp bạn so sánh được sự tiến hóa của công nghệ.
+\end{itemize}
+
+\pagebreak
+\section{Kiến trúc chi tiết}
+\subsection{OpenAI Whisper}
+\subsubsection{Sơ đồ kiến trúc}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/whisper_AD.png}
+    \caption{Sơ đồ kiến trúc OpenAI Whisper}
+\end{figure}
+
+
+\subsubsection{Số lượng tham số}
+Sử dụng mô hình kích thước \textbf{tiny} với \textbf{39 Triệu} tham số.
+
+\subsubsection{Hàm kích hoạt}
+Bao gồm 2 phần:
+\begin{itemize}
+    \item \textbf{2 x Conv1d} và \textbf{GELU activation function}: dùng để trích xuất các đặc trưng từ log-Mel spectrogram đầu vào.
+    \item \textbf{Positional Embedding:} Whisper sử dụng sinusoidal positional embedding cho phép mã hóa vị trí và vị trí của từng token và vị trí tương đối của từng token với nhau.
+\end{itemize}
+
+
+\pagebreak
+\subsection{PhoWhisper}
+Vì PhoWhisper là bản fine-tune của OpenAI Whisper nên kiến trúc, số lượng tham số và hàm kích hoạt đều tương tự OpenAI Whisper. 
+\subsubsection{Sơ đồ kiến trúc}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/whisper_AD.png}
+    \caption{Sơ đồ kiến trúc PhoWhisper}
+\end{figure}
+
+
+\subsubsection{Số lượng tham số}
+Sử dụng mô hình kích thước \textbf{tiny} với \textbf{39 Triệu} tham số.
+
+\subsubsection{Hàm kích hoạt}
+Bao gồm 2 phần:
+\begin{itemize}
+    \item \textbf{2 x Conv1d} và \textbf{GELU activation function}: dùng để trích xuất các đặc trưng từ log-Mel spectrogram đầu vào.
+    \item \textbf{Positional Embedding:} Whisper sử dụng sinusoidal positional embedding cho phép mã hóa vị trí và vị trí của từng token và vị trí tương đối của từng token với nhau.
+\end{itemize}
+
+
+\pagebreak
+\subsection{Wav2Vec2}
+\subsubsection{Sơ đồ kiến trúc}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/w2v2_AD.png}
+    \caption{Sơ đồ kiến trúc Wav2Vec2}
+\end{figure}
+
+
+\subsubsection{Số lượng tham số}
+Sử dụng mô hình kích thước \textbf{base} với \textbf{95 Triệu} tham số.
+
+\subsubsection{Hàm kích hoạt}
+Bao gồm 2 phần:
+\begin{itemize}
+    \item \textbf{2 x Conv1d} và \textbf{GELU activation function}: dùng để trích xuất các đặc trưng từ log-Mel spectrogram đầu vào.
+    \item \textbf{Positional Embedding:} Whisper sử dụng sinusoidal positional embedding cho phép mã hóa vị trí và vị trí của từng token và vị trí tương đối của từng token với nhau.
+\end{itemize}
