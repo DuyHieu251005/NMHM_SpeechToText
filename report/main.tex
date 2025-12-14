@@ -1,78 +1,22 @@
-\documentclass[13pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[myheadings]{fullpage}
-\usepackage[utf8]{vietnam}
-\usepackage[english]{babel}
-\usepackage{booktabs}
-\usepackage{array}
-\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\DeclareUnicodeCharacter{0301}{\hspace{-1ex}\'{ }}
-\usepackage{listings}
-\lstset{basicstyle=\ttfamily,breaklines=true}
+\documentclass[12pt, a4paper]{report}
 
-\usepackage[table]{xcolor}
-\definecolor{tableblue}{RGB}{84, 130, 201}
+%---------------CHOOSE PACKAGE---------------%
+% English report
+%\usepackage{package/dak_en_report}
 
-\usepackage{fancyhdr}
-\usepackage{lastpage}
-\usepackage{graphicx, wrapfig, subcaption, setspace, booktabs}
-%\usepackage[T1]{fontenc}
-\usepackage{float}
-\usepackage[font=small, labelfont=bf]{caption}
-\usepackage{times}
-\usepackage{mathptmx}
-\usepackage[protrusion=true, expansion=true]{microtype}
-\usepackage{ragged2e}
-\justifying
-\usepackage{amsmath,amssymb}
-\usepackage[colorinlistoftodos]{todonotes}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\usepackage{algpseudocode}
+%Vietnamese report
+\usepackage{package/dak_vn_report}
 
-% Cấu hình Bibliography
-\usepackage[backend=bibtex,style=ieee]{biblatex} 
-\addbibresource{references.bib}
-
-\usepackage{csquotes}
-\usepackage{url}
-
-\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
-\setstretch{1.15}
-\setcounter{tocdepth}{5}
-\setcounter{secnumdepth}{5}
-\usepackage[a4paper,top=2cm,bottom=1.5cm,left=2cm,right=2cm,marginparwidth=1.5cm]{geometry}
-
-\pagestyle{fancy}
-\fancyhf{}
-\setlength\headheight{15pt}
 \fancyhead[L]{23KHMT} 
 \fancyhead[R]{Lab 01}
 \fancyfoot[R]{\thepage}
-\setlength{\marginparwidth}{2cm}
 
-\renewcommand{\normalsize}{\fontsize{13}{15.6}\selectfont}
-
+%---------------DOCUMENT---------------%
 \begin{document}
-
-\date{}
-
-\title{ \normalsize VNU-HCM UNIVERSITY OF SCIENCE
-        \\ [1.0cm]
-        \includegraphics[width=100mm]{img/1.png}  \\[.5cm]
-        
-        \bfseries {Faculty of Information Technology}\\
-  
-        \\ [1.0cm]
-            {NHẬP MÔN HỌC MÁY}
-            \HRule{2pt} \\
-        \LARGE \textbf{Đồ án cuối kỳ: Model Report} 
-        \HRule{2pt} \\ [0.5cm]
-        \normalsize \today \vspace*{5\baselineskip}}
-        
-\date{}
-
-\author{
-        \textbf {Đồ án được thực hiện bởi} \\[0.5cm]
+%---------------COVER---------------%
+\covertitle{Nhập môn học máy}
+\projectname{MODEL REPORT}
+\info{\textbf {Đồ án được thực hiện bởi} \\[0.5cm]
             Đặng Anh Kiệt - 23127077 - 23KHMT \\
             Phạm Minh Triết - 23127132 - 23KHMT \\
             Trần Quang Phúc - 23127302 - 23KHMT \\
@@ -81,227 +25,34 @@
          \textbf {Supervised by} \\[0.5cm]
          Bùi Tiến Lên \\
          Lê Nhựt Nam \\
-         Võ Nhật Tân \\
-         }
-         
-\maketitle
-\newpage
+         Võ Nhật Tân 
+}
+\makecover{}
+
+%---------------TABLE OF CONTENTS---------------%
+\pagebreak
 \tableofcontents
-\newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Giới thiệu và Phát biểu Bài toán}
+\pagebreak
 
-\subsection{Định nghĩa Bài toán}
-Trong lĩnh vực Xử lý Ngôn ngữ Tự nhiên (NLP) và Xử lý Tín hiệu, dự án này giải quyết bài toán \textbf{Nhận dạng Tiếng nói Tiếng Việt Tự động (Vietnamese Automatic Speech Recognition - ASR)}. Mục tiêu chính là xây dựng một hệ thống học máy có khả năng chuyển đổi tín hiệu giọng nói của con người thành dạng văn bản tương ứng với độ chính xác cao.
+%---------------CONTENT---------------%
+\input{chapter/intro.tex}
+\pagebreak
+\input{chapter/chapter1.tex}
+\pagebreak
+\input{chapter/model.tex}
 
-Một cách hình thức, bài toán ASR có thể được định nghĩa là tìm chuỗi từ có khả năng xảy ra cao nhất $\hat{W}$ với đầu vào là chuỗi các đặc trưng âm thanh $X$. Bài toán này được mô hình hóa dưới dạng bài toán phân loại xác suất, trong đó chúng ta tìm cách tối đa hóa xác suất hậu nghiệm:
 
-\begin{equation}
-    \hat{W} = \operatorname*{argmax}_{W} P(W|X)
-\end{equation}
 
-Trong đó:
-\begin{itemize}
-    \item $X = \{x_1, x_2, \dots, x_T\}$ đại diện cho chuỗi các vector đặc trưng âm thanh được trích xuất từ đầu vào âm thanh thô (ví dụ: MFCC hoặc Spectrogram).
-    \item $W = \{w_1, w_2, \dots, w_N\}$ đại diện cho chuỗi các từ trong câu mục tiêu.
-    \item $P(W|X)$ là xác suất của chuỗi từ $W$ khi biết quan sát âm thanh $X$.
-\end{itemize}
 
-\subsection{Đặc tả Đầu vào và Đầu ra}
-Dựa trên phạm vi của dự án và bộ dữ liệu được sử dụng, các thông số kỹ thuật của hệ thống được định nghĩa như sau:
-\begin{itemize}
-    \item \textbf{Đầu vào (Input):} Các tệp âm thanh thô định dạng \texttt{.wav}, tần số lấy mẫu 16kHz. Nguồn dữ liệu bao gồm các tệp ghi âm từ bộ dữ liệu \textit{VIVOS}.
-    \item \textbf{Đầu ra (Output):} Một chuỗi văn bản đã chuẩn hóa (transcript) tương ứng với nội dung lời nói trong tệp âm thanh.
-\end{itemize}
 
-\subsection{Thách thức và Ý nghĩa}
-Việc phát triển hệ thống ASR cho tiếng Việt đặt ra những thách thức riêng biệt so với các ngôn ngữ không có thanh điệu (như tiếng Anh):
-\begin{enumerate}
-    \item \textbf{Đặc điểm thanh điệu:} Tiếng Việt là ngôn ngữ có thanh điệu với sáu thanh riêng biệt. Một thay đổi nhỏ về cao độ có thể thay đổi hoàn toàn nghĩa của từ, đòi hỏi mô hình phải nắm bắt được những biến thiên tần số tinh tế.
-    \item \textbf{Phương ngữ vùng miền:} Dữ liệu đầu vào (VIVOS) có thể chứa các biến thể về cách phát âm giữa các vùng miền khác nhau (giọng Bắc, Trung, Nam), làm tăng độ phức tạp cho mô hình âm học.
-    \item \textbf{Từ đồng âm:} Bản chất đơn âm tiết của tiếng Việt dẫn đến tần suất xuất hiện từ đồng âm cao, đòi hỏi mô hình ngôn ngữ phải đủ mạnh để suy luận từ đúng dựa trên ngữ cảnh.
-\end{enumerate}
 
-Giải quyết thành công bài toán này góp phần phát triển các ứng dụng thiết yếu như trợ lý ảo, hệ thống tạo phụ đề tự động và các giao diện điều khiển bằng giọng nói cho người dùng Việt Nam.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Phương pháp và nguồn thu thập dữ liệu}
 
-\subsection{Nguồn dữ liệu}
-Để giải quyết bài toán nhận dạng tiếng nói tiếng Việt (ASR), nhóm nghiên cứu sử dụng nguồn dữ liệu thứ cấp (secondary data) từ bộ dữ liệu công khai uy tín, không thực hiện thu thập mới qua API hay Web scraping.
 
-\begin{itemize}
-    % ĐÃ THÊM CITE TẠI ĐÂY
-    \item \textbf{Dataset sử dụng:} Bộ dữ liệu \textbf{VIVOS} \cite{luong2016vivos} (Vietnamese Speech Corpus for ASR).
-    \item \textbf{Nguồn gốc:} Bộ dữ liệu được phát hành bởi phòng thí nghiệm AILAB (Đại học Khoa học Tự nhiên, ĐHQG-HCM) và được tải về từ nền tảng lưu trữ Kaggle \cite{kaggle_vivos}.
-    \item \textbf{Đặc điểm:}
-    \begin{itemize}
-        \item Dữ liệu bao gồm 15 giờ ghi âm giọng nói tiếng Việt.
-        \item Được gán nhãn thủ công (transcribed) với độ chính xác cao.
-        \item Bao gồm sự đa dạng về giọng vùng miền (Bắc, Trung, Nam) và giới tính.
-    \end{itemize}
-    \item \textbf{Phạm vi:} Nhóm sử dụng tập dữ liệu này làm cơ sở chính (baseline) và không mở rộng thêm từ các nguồn bên ngoài trong giai đoạn này.
-\end{itemize}
 
-\subsection{Phương pháp thu thập}
-Quy trình thu thập và chuyển đổi dữ liệu được thực hiện theo các bước sau:
-
-\begin{enumerate}
-    \item \textbf{Bước 1 - Tải dữ liệu thô:} Tải bộ dữ liệu nén từ Kaggle và giải nén vào môi trường cục bộ.
-    \item \textbf{Bước 2 - Quét và Trích xuất (Automated Scanning):}
-    Sử dụng kịch bản (script) viết bằng ngôn ngữ \textbf{Python} để duyệt đệ quy qua toàn bộ thư mục dữ liệu. Script sử dụng các thư viện:
-    \begin{itemize}
-        \item \texttt{os, glob}: Để duyệt cây thư mục và quản lý đường dẫn.
-        \item \texttt{soundfile}: Để đọc metadata của tệp âm thanh (tần số lấy mẫu, thời lượng) mà không cần tải toàn bộ file vào bộ nhớ.
-    \end{itemize}
-    \item \textbf{Bước 3 - Tổng hợp thông tin:}
-    Kết hợp thông tin từ file âm thanh (\texttt{.wav}) với nhãn văn bản từ tệp \texttt{prompts.txt} và thông tin người nói từ \texttt{genders.txt}.
-    \item \textbf{Bước 4 - Lưu trữ trung gian:}
-    Kết quả quét được lưu dưới định dạng \texttt{.csv} (Comma-separated values) để phục vụ cho việc phân tích và nạp vào mô hình huấn luyện.
-\end{enumerate}
-
-\subsection{Quy trình làm sạch và tiền xử lý dữ liệu}
-Dữ liệu thô sau khi thu thập đã được trải qua quy trình làm sạch nghiêm ngặt để đảm bảo tính đúng đắn cho mô hình học máy:
-
-\begin{itemize}
-    \item \textbf{Loại bỏ nhiễu và dữ liệu lỗi (Noise Removal):}
-    Nhóm đã thực hiện kiểm tra tính toàn vẹn của file (integrity check). Các file âm thanh có header bị hỏng hoặc kích thước bằng 0 byte (corrupted files) đã được phát hiện và loại bỏ khỏi danh sách huấn luyện.
-    
-    \item \textbf{Xử lý dữ liệu thiếu (Missing Values):}
-    Thông qua đối chiếu giữa thư mục \texttt{waves} và file \texttt{prompts.txt}, nhóm đã lọc bỏ các mẫu dữ liệu có file âm thanh nhưng thiếu nhãn văn bản (transcript) tương ứng.
-    
-    \item \textbf{Chuẩn hóa và Biến đổi (Normalization):}
-    \begin{itemize}
-        \item \textbf{Encoding:} Chuyển đổi toàn bộ văn bản về bảng mã \texttt{UTF-8} để xử lý triệt để lỗi font tiếng Việt.
-        \item \textbf{Đồng bộ định danh:} Chuyển đổi tất cả ID người nói và tên file về định dạng chữ in hoa (UPPERCASE) để đảm bảo tính nhất quán khi ghép nối dữ liệu (khắc phục lỗi `vivos` vs `VIVOS`).
-    \end{itemize}
-    
-    \item \textbf{Kiểm tra sự nhất quán:}
-    Đảm bảo tất cả các file âm thanh đều có cùng tần số lấy mẫu (Sample Rate) là 16kHz. Các file sai lệch sẽ được đưa vào danh sách cần resample.
-\end{itemize}
-
-\subsection{Đảm bảo chất lượng dữ liệu}
-Để đảm bảo dữ liệu đầu vào tốt nhất cho mô hình, nhóm áp dụng các tiêu chí và phương pháp kiểm tra sau:
-
-\begin{itemize}
-    \item \textbf{Tiêu chí đánh giá dữ liệu tốt:}
-    \begin{itemize}
-        \item File âm thanh không bị cắt cụt (clipped) hoặc quá nhiều tạp âm nền.
-        \item Nhãn văn bản khớp chính xác với lời nói (word-level accuracy).
-        \item Độ dài câu nói nằm trong khoảng cho phép (từ 1s đến 15s) để tránh lỗi tràn bộ nhớ (OOM) khi huấn luyện.
-    \end{itemize}
-    
-    \item \textbf{Phương pháp kiểm tra:} Sử dụng phương pháp \textbf{Kiểm tra tự động (Automated Validation)}. Script Python tự động tính toán thống kê mô tả (độ dài trung bình, phân bố ký tự) để phát hiện các điểm dữ liệu bất thường (outliers) thay vì nghe kiểm tra thủ công từng file.
-\end{itemize}
-
-\subsection{Lưu trữ và quản lý dữ liệu}
-Dữ liệu được tổ chức theo cấu trúc phân cấp (hierarchical structure) để thuận tiện cho việc truy xuất theo batch:
-
-\begin{small} 
-\begin{verbatim}
-dataset/
-|-- train/
-|   |-- genders.txt       # Chua nhan gioi tinh (Gender labels)
-|   |-- prompts.txt       # Chua nhan van ban (Transcripts)
-|   |-- waves/
-|   |   |-- VIVOSSPK01/   # Thu muc nguoi noi 01
-|   |   |   |-- VIVOSSPK01_R001.wav
-|   |   |   `-- ...
-|   |   |-- VIVOSSPK02/
-|   |   `-- ...
-|-- test/
-|   |-- prompts.txt
-|   `-- waves/
-|       `-- ...
-\end{verbatim}
-\end{small}
-Mỗi thư mục con trong \texttt{waves} đại diện cho một người nói (Speaker ID), giúp mô hình dễ dàng truy cập thông tin về đặc trưng giọng nói (speaker embedding) nếu cần thiết.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Phân tích khám phá dữ liệu (EDA)}
-
-Để hiểu rõ đặc điểm của bộ dữ liệu VIVOS trước khi đưa vào huấn luyện mô hình, nhóm đã thực hiện phân tích thống kê mô tả và trực quan hóa dữ liệu trên cả hai khía cạnh: cấu trúc (metadata) và phi cấu trúc (tín hiệu âm thanh/văn bản).
-
-\subsection{Thống kê mô tả}
-Dựa trên kết quả trích xuất metadata từ 11,660 tệp âm thanh trong tập huấn luyện, các thống kê cơ bản được tổng hợp như sau:
-
-\begin{itemize}
-    \item \textbf{Số lượng mẫu:} 11,660 tệp âm thanh (.wav) tương ứng với 11,660 nhãn văn bản.
-    \item \textbf{Tỷ lệ dữ liệu thiếu (Missing Ratio):} 0\%. Sau bước tiền xử lý, toàn bộ các mẫu đều đảm bảo đầy đủ cặp \textit{Audio - Text}.
-    \item \textbf{Thống kê biến số định lượng:}
-\end{itemize}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Thuộc tính} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{Max} & \textbf{Median} \\
-\hline
-Thời lượng (giây) & 4.65 & 2.12 & 0.85 & 14.50 & 4.20 \\
-\hline
-Độ dài câu (số từ) & 9.20 & 3.45 & 2 & 25 & 9.00 \\
-\hline
-\end{tabular}
-\caption{Thống kê mô tả các thuộc tính quan trọng}
-\label{tab:stats}
-\end{table}
-
-\subsection{Phân tích phân bố và Cân bằng dữ liệu}
-Việc kiểm tra sự cân bằng của dữ liệu là rất quan trọng để tránh hiện tượng mô hình bị thiên lệch (bias).
-
-\begin{itemize}
-    \item \textbf{Phân bố theo Người nói (Speaker):} Dữ liệu được đóng góp bởi 46 người nói (Speakers). Biểu đồ cho thấy sự phân bố số lượng câu nói giữa các speaker là khá đồng đều, không có trường hợp một người chiếm quá 10\% tổng dữ liệu.
-    \item \textbf{Phân bố theo Giới tính:} Tỷ lệ Nam/Nữ (Male/Female) xấp xỉ 45\% - 55\%. Đây là tỷ lệ cân bằng lý tưởng, giúp mô hình nhận dạng tốt giọng của cả hai giới.
-    \item \textbf{Phân bố Thời lượng:} Hầu hết các file âm thanh có độ dài từ 3 đến 6 giây, phù hợp với các câu lệnh hoặc câu hội thoại ngắn.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\linewidth]{img/vivos_eda_charts.png}
-    \caption{Tổng quan phân bố dữ liệu: (1) Tỷ lệ giới tính, (2) Phân bố thời lượng, (3) Phân bố độ dài câu, (4) Đóng góp của từng người nói.}
-    \label{fig:eda_charts}
-\end{figure}
-
-\subsection{Phân tích mối quan hệ giữa các thuộc tính}
-Đối với bài toán ASR, mối tương quan quan trọng nhất là giữa \textbf{Thời lượng âm thanh (Duration)} và \textbf{Độ dài văn bản (Text Length)}.
-\begin{itemize}
-    \item \textbf{Nhận xét:} Hệ số tương quan Pearson $r > 0.8$, cho thấy mối quan hệ tuyến tính thuận (positive correlation) mạnh mẽ. Điều này chứng tỏ dữ liệu nhất quán: câu nói càng dài thì thời lượng ghi âm càng lớn, không có hiện tượng "file dài nhưng không có tiếng" (silence).
-\end{itemize}
-
-\subsection{Kiểm tra chất lượng dữ liệu}
-\begin{itemize}
-    \item \textbf{Phát hiện ngoại lệ (Outliers):}
-    \begin{itemize}
-        \item \textit{Thời lượng:} Đã loại bỏ các file $< 0.5s$ (quá ngắn, thường là nhiễu click chuột) và $> 20s$ (quá dài, dễ gây lỗi bộ nhớ).
-        \item \textit{Văn bản:} Đã kiểm tra và loại bỏ các ký tự lạ không thuộc bảng chữ cái tiếng Việt (ví dụ: số 1, 2, ký tự @, \#).
-    \end{itemize}
-    \item \textbf{Dữ liệu trùng lặp:} Không phát hiện file âm thanh trùng lặp về mặt nhị phân (binary hash).
-\end{itemize}
-
-\subsection{EDA cho dữ liệu phi cấu trúc}
-Phân tích sâu vào đặc trưng tín hiệu và văn bản:
-
-\subsubsection{Dữ liệu Văn bản (Text)}
-\begin{itemize}
-    \item \textbf{Bộ từ vựng (Vocabulary):} Dữ liệu bao phủ các âm tiết thông dụng trong tiếng Việt.
-    \item \textbf{Ký tự đặc biệt:} Văn bản đã được chuẩn hóa (Text Normalization) để loại bỏ dấu câu, chuyển về dạng in hoa (UPPERCASE) để giảm độ phức tạp cho mô hình (ví dụ: "Học máy..." $\rightarrow$ "HỌC MÁY...").
-\end{itemize}
-
-\subsubsection{Dữ liệu Âm thanh (Audio)}
-Hình ảnh dưới đây minh họa đặc trưng phổ (Spectrogram) của một mẫu dữ liệu điển hình (\texttt{VIVOSSPK01\_R001.wav}).
-\begin{itemize}
-    \item \textbf{Waveform:} Biên độ tín hiệu rõ ràng, tỷ lệ tín hiệu trên nhiễu (SNR) cao, nền tĩnh (ít tạp âm).
-    \item \textbf{Mel-Spectrogram:} Các dải tần số giọng nói (formants) hiển thị rõ nét, không bị mất mát thông tin ở các tần số cao.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{img/vivos_spectrogram.png}
-    \caption{Phân tích tín hiệu của một mẫu âm thanh: (Trên) Waveform, (Dưới) Mel-Spectrogram.}
-    \label{fig:spectrogram}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section{Tài liệu tham khảo}
-\printbibliography[heading=none]
+%---------------BIBLIOGRAPHY---------------%
+\pagebreak
+\nocite{*}
+\printbibliography
 
 \end{document}
