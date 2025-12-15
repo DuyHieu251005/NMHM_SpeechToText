@@ -1,0 +1,297 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chương 2: Kết quả thực nghiệm
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Kết quả thực nghiệm}
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{Cấu hình huấn luyện}
+
+% \textbf{Wav2Vec2:}
+% \begin{itemize}
+%     \item Mô hình gốc: \texttt{nguyenvulebinh/wav2vec2-base-vietnamese-250h}
+%     \item Số epoch: 5
+%     \item Batch size: 4
+%     \item Tổng số step: 3,645
+%     \item Evaluation step: 200
+%     \item Learning rate scheduler: Cosine decay
+% \end{itemize}
+
+% \textbf{PhoWhisper (Fine-tuned với LoRA):}
+% \begin{itemize}
+%     \item Mô hình gốc: \texttt{vinai/PhoWhisper-small}
+%     \item Kỹ thuật: LoRA (Low-Rank Adaptation)
+%     \item Số step tối đa: 500
+%     \item Batch size: 4
+%     \item Evaluation step: 100
+%     \item Learning rate ban đầu: $9.02 \times 10^{-4}$
+% \end{itemize}
+
+% \textbf{Whisper-tiny:}
+% \begin{itemize}
+%     \item Mô hình gốc: \texttt{openai/whisper-tiny}
+%     \item Số epoch: 3
+%     \item Batch size: 16
+%     \item Gradient accumulation: 1
+%     \item Learning rate: $1 \times 10^{-5}$
+% \end{itemize}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Biểu đồ quá trình học (Learning Curves) }
+
+Biểu đồ quá trình học (Learning Curves) thể hiện quá trình hội tụ của mô hình qua các step huấn luyện. Các biểu đồ bao gồm Training Loss, Validation Loss và Word Error Rate (WER) trên tập validation.
+
+\subsection{Wav2Vec2}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../Wav2Vec2/Hinh_1_Learning_Curves.png}
+    \caption{Learning Curves của mô hình Wav2Vec2: Loss và WER theo số step}
+    \label{fig:wav2vec2_learning}
+\end{figure}
+
+\textbf{Phân tích Wav2Vec2:}
+\begin{itemize}
+    \item Training Loss giảm mạnh từ 14.44 (step 50) xuống còn 0.19 (step 3600), đạt mức cải thiện đáng kể.
+    \item Validation Loss hội tụ ổn định ở mức 0.186 sau 5 epoch huấn luyện. Mô hình hội tụ tốt.
+    \item WER ban đầu ở mức 100\% (mô hình chưa học được gì), sau đó giảm nhanh xuống còn khoảng 11.24\% ở step cuối cùng.
+    \item Khoảng cách giữa Training Loss và Validation Loss nhỏ, cân bằng giữa học tập và tổng quát hóa, không bị overfitting hoặc underfitting
+\end{itemize}
+
+\subsection{PhoWhisper}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../PhoWhisper/phowhisper_learning_curves.png}
+    \caption{Learning Curves của mô hình PhoWhisper: Loss và WER theo epoch}
+    \label{fig:phowhisper_learning}
+\end{figure}
+
+\textbf{Phân tích PhoWhisper:}
+\begin{itemize}
+    \item Training Loss giảm từ 4.42 (step 50) xuống còn 0.235 (step 500).
+    \item Validation Loss giảm từ 0.809 xuống còn 0.328.
+    \item Mô hình hội tụ nhanh 
+    \item WER giao động mạnh. WER Mean trên tập đánh giá (200 mẫu test): 32.89\%.
+\end{itemize}
+
+\subsection{Whisper-tiny}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../Whisper/Hinh_1_Learning_Curves.png}
+    \caption{Learning Curves của mô hình Whisper-tiny: Loss và WER theo epoch}
+    \label{fig:whisper_learning}
+\end{figure}
+
+\textbf{Phân tích Whisper-tiny:}
+\begin{itemize}
+    \item Training Loss giảm từ 2.5 xuống còn khoảng 0.5 sau 3 epoch.
+    \item Validation Loss duy trì ở mức ổn định, stas với training loss. Nhưng WER\% trên validation set lại tăng, biểu đồ cho thấy WER giảm liên tục nhưng tăng mạnh từ khoảng step 5800, tạo biểu đồ hình chữ U. Sự cải thiện của mô hình sau finetune là không đáng kể. 
+    \item WER trên tập test: khoảng 45-50\%. 
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Đánh giá trên tập Test}
+
+\subsection{Độ đo đánh giá}
+
+\begin{itemize}
+    \item \textbf{Word Error Rate (WER):} Tỷ lệ lỗi từ, được tính bằng công thức:
+    \[
+    WER = \frac{S + D + I}{N} \times 100\%
+    \]
+    trong đó $S$ là số từ thay thế (substitution), $D$ là số từ bị xóa (deletion), $I$ là số từ chèn thêm (insertion), và $N$ là tổng số từ trong câu tham chiếu.
+\end{itemize}
+
+\subsection{Kết quả tổng hợp}
+
+Bảng \ref{tab:results_summary} tổng hợp kết quả đánh giá của ba mô hình trên tập test VIVOS:
+
+\begin{table}[H]
+    \centering
+    \caption{Kết quả đánh giá các mô hình trên tập test VIVOS}
+    \label{tab:results_summary}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Mô hình} & \textbf{WER (\%)} & \textbf{Số mẫu test} \\
+        \hline
+        Wav2Vec2 (Fine-tuned) & \textbf{11.24} & 760 \\
+        \hline
+        PhoWhisper (LoRA Fine-tuned) & 32.89 & 200 \\
+        \hline
+        Whisper-tiny (Fine-tuned) & 45-50 & 760 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Nhận xét:}
+\begin{itemize}
+    \item \textbf{Wav2Vec2} đạt kết quả tốt nhất với WER = 11.24\%, cho thấy mô hình pretrained trên tiếng Việt có lợi thế lớn.
+    \item \textbf{PhoWhisper} với kỹ thuật LoRA fine-tuning đạt WER = 32.89\% trên 200 mẫu test.
+    \item \textbf{Whisper-tiny} có WER cao nhất do kích thước mô hình nhỏ và được huấn luyện chủ yếu trên dữ liệu tiếng Anh.
+\end{itemize}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{Phân tích lỗi}
+
+% \subsection{Phân bố sai số độ dài câu}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{../Wav2Vec2/Hinh_2_Error_Distribution.png}
+%     \caption{Phân bố sai số độ dài câu (Prediction - Reference) của Wav2Vec2}
+%     \label{fig:wav2vec2_error}
+% \end{figure}
+
+% Biểu đồ phân bố sai số cho thấy:
+% \begin{itemize}
+%     \item Phần lớn các mẫu có sai số gần 0, cho thấy độ dài câu dự đoán khá khớp với câu gốc.
+%     \item Một số mẫu có sai số âm (dự đoán ngắn hơn) hoặc dương (dự đoán dài hơn).
+%     \item Mô hình Wav2Vec2 có xu hướng dự đoán câu với độ dài tương đương câu gốc.
+% \end{itemize}
+
+% \subsection{Phân tích các loại lỗi phổ biến}
+
+
+% \begin{enumerate}
+%     \item \textbf{Lỗi thanh điệu:} Nhầm lẫn giữa các thanh điệu tiếng Việt (ví dụ: ``dè dặt'' $\rightarrow$ ``dề giặt'').
+    
+%     \item \textbf{Lỗi phụ âm đầu:} Nhầm lẫn các phụ âm có âm thanh gần giống (ví dụ: ``điện thoại'' $\rightarrow$ ``điện thải'').
+    
+%     \item \textbf{Lỗi nguyên âm:} Thay thế các nguyên âm có cách phát âm tương tự (ví dụ: ``xuân'' $\rightarrow$ ``sân'').
+    
+%     \item \textbf{Lỗi từ đồng âm:} Nhận dạng sai các từ có cách phát âm giống nhau nhưng nghĩa khác nhau.
+% \end{enumerate}
+
+
+% %% where tf is this data
+% \begin{table}[H]
+%     \centering
+%     \caption{Ví dụ một số lỗi nhận dạng điển hình}
+%     \label{tab:error_examples}
+%     \begin{tabular}{|l|l|}
+%         \hline
+%         \textbf{Câu gốc (Reference)} & \textbf{Dự đoán (Prediction)} \\
+%         \hline
+%         cũng khiến cho họ dè dặt & cũng khiến cho họ dề giặt \\
+%         \hline
+%         điện thoại reng nhưng ta & điện thải len dên ta \\
+%         cũng phải nhấc máy & cũng phải nhắt máy \\
+%         \hline
+%         hợp với hương vị đầu xuân & hợp với hương vị đầu sân \\
+%         \hline
+%         có thể lành lặn mà & có thể làm lặng mà \\
+%         không để lại vết sẹo & không để lại vếi xẹo \\
+%         \hline
+%     \end{tabular}
+% \end{table}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{So sánh các mô hình}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.7\textwidth]{../Wav2Vec2/Hinh_3_Comparison.png}
+%     \caption{So sánh WER giữa các mô hình}
+%     \label{fig:model_comparison}
+% \end{figure}
+
+% \begin{table}[H]
+%     \centering
+%     \caption{So sánh chi tiết các mô hình}
+%     \label{tab:model_comparison}
+%     \begin{tabular}{|l|c|c|c|}
+%         \hline
+%         \textbf{Đặc điểm} & \textbf{Wav2Vec2} & \textbf{PhoWhisper} & \textbf{Whisper-tiny} \\
+%         \hline
+%         WER (\%) & \textbf{11.24} & 32.89 & 45-50 \\
+%         \hline
+%         Thời gian huấn luyện & Dài & Ngắn (LoRA) & Trung bình \\
+%         \hline
+%         Kích thước mô hình & Base (90M) & Small (244M) & Tiny (39M) \\
+%         \hline
+%         Ngôn ngữ pretrain & Tiếng Việt & Tiếng Việt & Đa ngôn ngữ \\
+%         \hline
+%         Kiến trúc & CNN + Transformer & Encoder-Decoder & Encoder-Decoder \\
+%         \hline
+%     \end{tabular}
+% \end{table}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{Kết luận thực nghiệm}
+
+% Từ các kết quả thực nghiệm, chúng tôi rút ra một số kết luận sau:
+
+% \begin{enumerate}
+%     \item \textbf{Mô hình pretrained trên tiếng Việt có ưu thế:} Wav2Vec2 được pretrain trên 250 giờ tiếng Việt cho kết quả tốt nhất (WER = 11.24\%).
+    
+%     \item \textbf{LoRA là kỹ thuật fine-tuning hiệu quả:} PhoWhisper sử dụng LoRA giúp giảm đáng kể thời gian huấn luyện và tài nguyên tính toán, đồng thời vẫn đạt được kết quả khả quan.
+    
+%     \item \textbf{Kích thước mô hình ảnh hưởng đến hiệu năng:} Whisper-tiny với kích thước nhỏ nhất (39M parameters) cho kết quả thấp nhất, cho thấy trade-off giữa kích thước và chất lượng.
+    
+%     \item \textbf{Các lỗi chủ yếu liên quan đến đặc thù tiếng Việt:} Thanh điệu, phụ âm và nguyên âm đặc trưng của tiếng Việt là những thách thức chính trong nhận dạng giọng nói.
+% \end{enumerate}
+
+% \begin{table}[H]
+%     \centering
+%     \caption{Bảng so sánh tổng hợp các hạng mục đánh giá giữa 3 mô hình sau fine-tuning}
+%     \label{tab:evaluation_comparison}
+%     \begin{tabular}{|l|c|c|c|}
+%         \hline
+%         \textbf{Hạng mục đánh giá} & \textbf{Wav2Vec2} & \textbf{PhoWhisper} & \textbf{Whisper-tiny} \\
+%         \hline
+%         \hline
+%         \multicolumn{4}{|c|}{\textit{\textbf{Độ đo chất lượng}}} \\
+%         \hline
+%         WER (\%) $\downarrow$ & \textbf{11.24} & 32.89 & 45-50 \\
+%         \hline
+%         \hline
+%         \hline
+%         \multicolumn{4}{|c|}{\textit{\textbf{Cấu hình huấn luyện}}} \\
+%         \hline
+%         Mô hình gốc & wav2vec2-base-vi & PhoWhisper-small & whisper-tiny \\
+%         \hline
+%         Kỹ thuật fine-tuning & Full fine-tuning & LoRA & Full fine-tuning \\
+%         \hline
+%         Số epoch/step & 5 epochs (3,645 steps) & 500 steps & 3 epochs \\
+%         \hline
+%         Batch size & 4 & 4 & 16 \\
+%         \hline
+%         Learning rate & Cosine decay & $9.02 \times 10^{-4}$ & $1 \times 10^{-5}$ \\
+%         \hline
+%         \hline
+%         \multicolumn{3}{|c|}{\textit{\textbf{Đặc điểm mô hình}}} \\
+%         \hline
+%         Số tham số & 90M (Base) & 244M (Small) & 39M (Tiny) \\
+%         \hline
+%         Kiến trúc & CNN + Transformer & Encoder-Decoder & Encoder-Decoder \\
+%         \hline
+%         Ngôn ngữ pretrain & Tiếng Việt (250h) & Tiếng Việt & Đa ngôn ngữ \\
+%         \hline
+%         \hline
+%         \multicolumn{4}{|c|}{\textit{\textbf{Quá trình hội tụ}}} \\
+%         \hline
+%         Training Loss (đầu) & 14.44 & 4.42 & 2.5 \\
+%         \hline
+%         Training Loss (cuối) & 0.19 & 0.235 & 0.5 \\
+%         \hline
+%         Validation Loss (cuối) & 0.186 & 0.328 & Ổn định \\
+%         \hline
+%         Tốc độ hội tụ & Trung bình & Nhanh & Chậm \\
+%         \hline
+%         \hline
+%         \multicolumn{3}{|c|}{\textit{\textbf{Tài nguyên \& Triển khai}}} \\
+%         \hline
+%         Thời gian huấn luyện & Dài & \textbf{Ngắn} & Trung bình \\
+%         \hline
+%         Yêu cầu bộ nhớ GPU & Trung bình & Thấp (LoRA) & Thấp \\
+%         \hline
+%         Số mẫu test & 760 & 200 & 760 \\
+%         \hline
+%     \end{tabular}
+% \end{table}
+
+% \textbf{Ghi chú:} Ký hiệu $\downarrow$ biểu thị giá trị càng thấp càng tốt. Các giá trị \textbf{in đậm} thể hiện kết quả tốt nhất trong từng hạng mục.
