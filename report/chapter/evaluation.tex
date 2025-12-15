@@ -63,14 +63,38 @@ Hướng khắc phục:
 \end{itemize}
 
 \section{So sánh}
-\begin{tabular}{|c|c|c|c|}
-    \hline
-    \textbf{Model} & \textbf{Train loss} & \textbf{Eval loss} & \textbf{WER (\%)}  \\
-    \hline
-    Wav2Vec2 (fine-tuned) & 0.1995 & 0.1865 & 11.24  \\
-    \hline
-    PhoWhisper (fine-tuned) & 0.2352 & 0.3283 & 32.89  \\
-    \hline
-    OpenAI Whisper & 0.05 & 0.40 & 11.0  \\
-    \hline
-\end{tabular}
+
+\begin{table}[H]
+    \centering
+    \caption{Bảng so sánh tổng hợp các hạng mục đánh giá giữa 3 mô hình sau fine-tuning}
+    \label{tab:evaluation_comparison}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Hạng mục đánh giá} & \textbf{Wav2Vec2} & \textbf{PhoWhisper} & \textbf{Whisper-tiny} \\
+        \hline
+        \hline
+        \multicolumn{4}{|c|}{\textit{\textbf{Độ đo chất lượng}}} \\
+        \hline
+        WER (\%) $\downarrow$ & \textbf{11.24} & 305 & 42.7 \\
+        \hline
+        \hline
+        \multicolumn{4}{|c|}{\textit{\textbf{Cấu hình huấn luyện}}} \\
+        \hline
+        Mô hình gốc & wav2vec2-base-vi & PhoWhisper-small & whisper-tiny \\
+        \hline
+        Kỹ thuật fine-tuning & Full fine-tuning & LoRA & Full fine-tuning \\
+        \hline
+        Batch size & 4 & 4 & 16 \\
+        \hline
+        \hline
+        \multicolumn{4}{|c|}{\textit{\textbf{Quá trình hội tụ}}} \\
+        \hline
+        Training Loss (đầu) & 14.44 & 4.42 & 4.72 \\
+        \hline
+        Training Loss (cuối) & 0.1995 & 0.2352 & 0.0121 \\
+        \hline
+        Validation Loss (cuối) & 0.186 & 0.328 & 0.4125 \\
+        \hline
+        
+    \end{tabular}
+\end{table}
