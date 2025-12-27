@@ -4,10 +4,13 @@ Sử dụng Flask với 3 mô hình: Wav2Vec2, PhoWhisper, OpenAI Whisper
 """
 
 import os
+import uuid
 import torch
 import librosa
 import tempfile
+import soundfile as sf
 import numpy as np
+import traceback
 from flask import Flask, render_template, request, jsonify
 from transformers import (
     Wav2Vec2ForCTC, 
@@ -154,9 +157,23 @@ def transcribe():
         if audio_file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
         
-        # Save temporarily
-        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_audio.wav')
-        audio_file.save(temp_path)
+        # Generate unique filename with original extension
+        original_ext = os.path.splitext(audio_file.filename)[1] or '.webm'
+        unique_id = str(uuid.uuid4())[:8]
+        temp_input = os.path.join(app.config['UPLOAD_FOLDER'], f'input_{unique_id}{original_ext}')
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f'audio_{unique_id}.wav')
+        
+        # Save uploaded file
+        audio_file.save(temp_input)
+        
+        # Convert to WAV using librosa (handles webm, ogg, mp3, etc.)
+        try:
+            audio, sr = librosa.load(temp_input, sr=16000)
+            sf.write(temp_path, audio, 16000)
+        except Exception as e:
+            # If librosa fails, try using the original file
+            print(f"Audio conversion warning: {e}")
+            temp_path = temp_input
         
         # Transcribe based on model choice
         if model_choice == 'wav2vec2':
@@ -168,9 +185,13 @@ def transcribe():
         else:
             return jsonify({'error': 'Invalid model choice'}), 400
         
-        # Clean up
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+        # Clean up temp files
+        for f in [temp_path, temp_input]:
+            if os.path.exists(f):
+                try:
+                    os.remove(f)
+                except:
+                    pass
         
         return jsonify({
             'success': True,
@@ -179,6 +200,8 @@ def transcribe():
         })
         
     except Exception as e:
+        print(f"ERROR in /transcribe: {str(e)}")
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/health')

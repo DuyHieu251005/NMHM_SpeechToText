@@ -392,19 +392,39 @@
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    // Try to use best supported format
+                    let mimeType = 'audio/webm';
+                    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                        mimeType = 'audio/webm;codecs=opus';
+                    } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+                        mimeType = 'audio/ogg;codecs=opus';
+                    } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                        mimeType = 'audio/mp4';
+                    }
+                    
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
                     audioChunks = [];
                     
                     mediaRecorder.ondataavailable = (e) => {
-                        audioChunks.push(e.data);
+                        if (e.data.size > 0) {
+                            audioChunks.push(e.data);
+                        }
                     };
                     
                     mediaRecorder.onstop = () => {
-                        recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        // Get the actual mime type used
+                        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+                        const extension = mimeType.includes('ogg') ? '.ogg' : 
+                                         mimeType.includes('mp4') ? '.mp4' : '.webm';
+                        recordedBlob = new Blob(audioChunks, { type: mimeType });
                         const audioUrl = URL.createObjectURL(recordedBlob);
                         document.getElementById('recordedAudioPlayer').src = audioUrl;
                         document.getElementById('recordedAudioPreview').style.display = 'block';
                         document.getElementById('transcribeRecordBtn').style.display = 'inline-block';
+                        
+                        // Store extension for later use
+                        recordedBlob.extension = extension;
                     };
                     
                     mediaRecorder.start();
@@ -466,7 +486,16 @@
         async function transcribe(audioData) {
             const model = document.getElementById('modelSelect').value;
             const formData = new FormData();
-            formData.append('audio', audioData, 'audio.wav');
+            
+            // Determine filename with correct extension
+            let filename = 'audio.wav';
+            if (audioData.extension) {
+                filename = 'recording' + audioData.extension;
+            } else if (audioData.name) {
+                filename = audioData.name;
+            }
+            
+            formData.append('audio', audioData, filename);
             formData.append('model', model);
             
             // Show loading

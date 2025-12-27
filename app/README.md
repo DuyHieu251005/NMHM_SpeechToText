@@ -47,10 +47,69 @@ Mở trình duyệt và truy cập: **http://localhost:5000**
 
 ## Yêu cầu hệ thống
 
-- Python 3.8+
+- Python 3.8+ (khuyến nghị 3.10 hoặc 3.11)
 - RAM: tối thiểu 8GB (khuyến nghị 16GB)
 - GPU: NVIDIA GPU với CUDA (khuyến nghị, không bắt buộc)
 - Dung lượng: ~5GB cho các mô hình
+- **FFmpeg**: Bắt buộc để xử lý audio từ microphone
+
+## Cài đặt FFmpeg (BẮT BUỘC)
+
+FFmpeg là thư viện xử lý audio/video, cần thiết để decode các định dạng webm/ogg từ trình duyệt.
+
+### Windows (sử dụng winget):
+```powershell
+winget install --id Gyan.FFmpeg -e --source winget
+```
+*Sau khi cài, restart terminal hoặc VS Code để nhận PATH mới.*
+
+### Windows (thủ công):
+1. Tải từ https://www.gyan.dev/ffmpeg/builds/
+2. Giải nén vào `C:\ffmpeg`
+3. Thêm `C:\ffmpeg\bin` vào biến môi trường PATH
+
+### Linux (Ubuntu/Debian):
+```bash
+sudo apt update && sudo apt install ffmpeg
+```
+
+### macOS:
+```bash
+brew install ffmpeg
+```
+
+### Kiểm tra cài đặt:
+```bash
+ffmpeg -version
+```
+
+## Cài đặt CUDA (Tùy chọn - cho GPU NVIDIA)
+
+Nếu bạn có GPU NVIDIA và muốn tăng tốc inference:
+
+1. Cài đặt [CUDA Toolkit 11.8+](https://developer.nvidia.com/cuda-downloads)
+2. Cài đặt PyTorch với CUDA:
+```bash
+pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+## Xử lý lỗi thường gặp
+
+### Lỗi `audioread.exceptions.NoBackendError`
+**Nguyên nhân**: Thiếu FFmpeg  
+**Giải pháp**: Cài đặt FFmpeg theo hướng dẫn ở trên, sau đó restart terminal/VS Code
+
+### Lỗi `CUDA out of memory`
+**Nguyên nhân**: GPU không đủ VRAM  
+**Giải pháp**: Sử dụng CPU bằng cách set `device = "cpu"` trong app.py
+
+### Lỗi `No module named 'xxx'`
+**Nguyên nhân**: Thiếu thư viện  
+**Giải pháp**: `pip install -r requirements.txt`
+
+### Lỗi microphone không hoạt động
+**Nguyên nhân**: Trình duyệt chưa được cấp quyền  
+**Giải pháp**: Nhấn biểu tượng khóa trên thanh địa chỉ → Cho phép Microphone → Refresh trang
 
 ## Cấu trúc thư mục
 
