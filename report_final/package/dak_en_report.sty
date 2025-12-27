@@ -1,0 +1,109 @@
+\ProvidesPackage{package/dak_en_report}
+
+\RequirePackage{amsmath}
+\RequirePackage{graphicx}
+\RequirePackage{fancyhdr}
+\RequirePackage{lipsum}
+\RequirePackage{geometry}
+\RequirePackage{times}
+\RequirePackage{hyperref}
+\RequirePackage{biblatex}
+\RequirePackage{xcolor}
+\RequirePackage{float}
+\RequirePackage{microtype}
+\RequirePackage{listings}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{longtable}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+
+\addbibresource{reference/references.bib}
+\geometry{a4paper, margin=1in}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,      
+    urlcolor=blue,
+    citecolor=black,
+}
+
+\linespread{1.5}
+\makeatletter
+
+\definecolor{Logo_Blue}{RGB}{0,63,136}
+\def\@faculty{Faculty of Information Technology}
+
+\def\@covertitle{Use command \textbackslash covertitle to change}
+\def\@projectname{Use command \textbackslash projectname to change}
+\def\@info{Use command \textbackslash info to change}
+
+\newcommand{\makecover}{
+    \thispagestyle{empty}
+    \begin{centering}
+    \includegraphics[width=100mm]{img/logo.png}\\[0.5cm]
+    \normalsize\bfseries{\textcolor{Logo_Blue}{\@faculty}} \vfill
+    \Large\textbf{\@covertitle}\\
+    \noindent\textcolor{Logo_Blue}{\hrulefill}\\
+    \Huge \textbf{\textcolor{Logo_Blue}{\@projectname}}\\
+    \noindent\textcolor{Logo_Blue}{\hrulefill}\\
+    \normalsize\today
+    \end{centering}
+    \begin{centering}
+    \vfill
+    \@info\\
+    \end{centering}
+}
+
+\newcommand{\acknowledgment}{
+    \section*{Acknowledgement}
+}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{blue}{rgb}{0,0,1}
+\definecolor{deepblue}{rgb}{0,0,0.65}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+\definecolor{codeorangered}{RGB}{199,134,64}
+ 
+\lstdefinestyle{mystyle}{
+    language=Python,
+    backgroundcolor={\color{backcolour}},   
+    commentstyle={\color{deepgreen}},
+    keywordstyle={\color{codepurple}},
+    keywordstyle=[2]{},
+    numberstyle={\tiny\color{codegray}},
+    stringstyle={\color{codeorangered}},
+    emph={
+        _handle_PacketIn, cores21_setup, __init__, part1_topo, build
+    },
+    emphstyle={\color{deepred}},
+    emph=[2]{
+        self, transcription, text, pred_norm, ref_norm, attention_mask, labels
+    },
+    emphstyle={[2]\color{blue}},
+    emph=[3]{
+        of, pkt
+    },
+    emphstyle={[3]\color{codeorangered}},
+    emph=[3]{
+        {\brack}
+    },
+    emphstyle={[3]\color{codegreen}},
+    basicstyle={\footnotesize},
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,           
+    tabsize=1,
+}
+\endinput

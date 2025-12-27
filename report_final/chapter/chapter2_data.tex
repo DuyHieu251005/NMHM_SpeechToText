@@ -1,0 +1,174 @@
+\chapter{Thu thập và Phân tích Dữ liệu}
+
+\section{Nguồn và Phương pháp Thu thập}
+
+\subsection{Nguồn dữ liệu: Bộ dữ liệu VIVOS}
+
+Đồ án sử dụng bộ dữ liệu \textbf{VIVOS} - một bộ dữ liệu tiếng Việt chuẩn được sử dụng rộng rãi trong nghiên cứu ASR. Thông tin chi tiết về bộ dữ liệu:
+
+\begin{table}[H]
+\centering
+\caption{Thông tin tổng quan bộ dữ liệu VIVOS}
+\label{tab:vivos_info}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Thuộc tính} & \textbf{Giá trị} \\
+\hline
+Tổng số giờ audio & 15 giờ \\
+\hline
+Tần số lấy mẫu & 16,000 Hz (16 kHz) \\
+\hline
+Định dạng file & WAV \\
+\hline
+Ngôn ngữ & Tiếng Việt (giọng miền Nam) \\
+\hline
+Môi trường ghi âm & Phòng yên tĩnh, microphone chất lượng cao \\
+\hline
+Nội dung & Người đọc đọc từng dòng văn bản đã chuẩn bị sẵn \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Lý do chọn bộ dữ liệu VIVOS}
+
+\begin{enumerate}
+    \item \textbf{Chất lượng cao}: Audio được ghi âm trong môi trường kiểm soát, ít nhiễu.
+    \item \textbf{Chuẩn hóa}: Bộ dữ liệu đã được chia sẵn train/test, thuận tiện cho việc so sánh với các nghiên cứu khác.
+    \item \textbf{Phổ biến}: Được sử dụng rộng rãi trong cộng đồng nghiên cứu ASR tiếng Việt.
+    \item \textbf{Kích thước phù hợp}: 15 giờ audio đủ để fine-tune các mô hình pretrained.
+\end{enumerate}
+
+\subsection{Cấu trúc dữ liệu}
+
+Dữ liệu được tổ chức theo cấu trúc:
+\begin{itemize}
+    \item \texttt{waves/SPEAKER\_ID/FILE\_ID.wav}: Các file audio WAV
+    \item \texttt{prompts.txt}: File transcript với định dạng \texttt{FILE\_ID câu\_văn\_bản}
+\end{itemize}
+
+\subsection{Các mô hình Pretrained sử dụng}
+
+\begin{itemize}
+    \item Mô hình \texttt{nguyenvulebinh/wav2vec2-base-vietnamese-250h} được fine-tune trên VIVOS trong nghiên cứu này.
+    \item Mô hình \texttt{vinai/PhoWhisper-small} được VinAI pretrain trên lượng dữ liệu tiếng Việt lớn, sau đó được fine-tune trên VIVOS.
+    \item Mô hình \texttt{openai/whisper-tiny} được OpenAI pretrain trên lượng dữ liệu đa ngôn ngữ lớn, sau đó được fine-tune trên VIVOS.
+\end{itemize}
+
+Việc sử dụng pretrained models giúp tận dụng kiến thức đã học từ dữ liệu lớn, chỉ cần fine-tune trên VIVOS 15 giờ để đạt hiệu quả cao.
+
+\section{Tiền xử lý và Làm sạch}
+
+\subsection{Xử lý Audio}
+
+\begin{enumerate}
+    \item \textbf{Tải file âm thanh}: Đọc file WAV từ thư mục \texttt{waves/} theo cấu trúc \texttt{waves/SPEAKER\_ID/FILE\_ID.wav}.
+    
+    \item \textbf{Resampling}: Chuyển đổi tần số lấy mẫu về 16,000 Hz (16 kHz) - là tần số chuẩn của VIVOS và phù hợp với các mô hình ASR.
+    
+    \item \textbf{Feature Extraction}:
+    \begin{itemize}
+        \item \textbf{PhoWhisper và OpenAI Whisper}: Chuyển đổi audio thành Log-Mel Spectrogram bằng \texttt{WhisperProcessor.feature\_extractor()}. Spectrogram này là biểu diễn 2D của tín hiệu âm thanh theo thời gian và tần số.
+        \item \textbf{Wav2Vec2}: Sử dụng \texttt{Wav2Vec2FeatureExtractor} để chuẩn hóa waveform thành \texttt{input\_values} với padding phù hợp.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Xử lý Text (Nhãn)}
+
+\begin{enumerate}
+    \item \textbf{Đọc transcript}: Tải nội dung văn bản từ file \texttt{prompts.txt}, mỗi dòng có định dạng: \texttt{FILE\_ID câu\_văn\_bản}.
+    
+    \item \textbf{Normalization}: Chuẩn hóa văn bản về chữ thường (lowercase) tiếng Việt:
+    \begin{lstlisting}[style=mystyle]
+ref_norm = text.lower().strip()
+pred_norm = transcription.lower().strip()
+    \end{lstlisting}
+    
+    \item \textbf{Tokenization}:
+    \begin{itemize}
+        \item \textbf{PhoWhisper và OpenAI Whisper}: Sử dụng \texttt{WhisperProcessor.tokenizer()} để chuyển văn bản thành chuỗi token IDs, lưu vào trường \texttt{labels}.
+        \item \textbf{Wav2Vec2}: Sử dụng \texttt{Wav2Vec2CTCTokenizer} với các token đặc biệt: \texttt{[UNK]} (unknown), \texttt{[PAD]} (padding), và \texttt{|} (word delimiter).
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Data Collation}
+
+Trong quá trình huấn luyện, các batch dữ liệu được xử lý bởi Data Collator:
+
+\begin{itemize}
+    \item \textbf{Padding}: Các input features và labels được pad về cùng độ dài trong mỗi batch.
+    \item \textbf{Masking}: Padding tokens trong labels được thay bằng giá trị \texttt{-100} để không tính vào hàm loss:
+    \begin{lstlisting}[style=mystyle]
+labels = labels.masked_fill(attention_mask.ne(1), -100)
+    \end{lstlisting}
+    \item \textbf{Loại bỏ BOS token}: Token bắt đầu câu (BOS - Beginning of Sentence) được loại bỏ khỏi labels nếu có.
+\end{itemize}
+
+\section{Phân tích Khám phá Dữ liệu (EDA)}
+
+\subsection{Thống kê Mô tả}
+
+\begin{table}[H]
+\centering
+\caption{Thống kê mô tả bộ dữ liệu VIVOS}
+\label{tab:vivos_stats}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Thuộc tính} & \textbf{Giá trị} \\
+\hline
+Tổng số mẫu & 12,420 \\
+\hline
+Tổng thời lượng & 15 giờ \\
+\hline
+Tần số lấy mẫu & 16 kHz \\
+\hline
+Số kênh audio & Mono (1 kênh) \\
+\hline
+Bit depth & 16-bit \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Phân bố Dữ liệu}
+
+Bộ dữ liệu VIVOS đã được chia sẵn thành hai tập: \texttt{train} và \texttt{test}. Tỷ lệ chia cụ thể như sau:
+
+\begin{table}[H]
+\centering
+\caption{Phân chia dữ liệu VIVOS}
+\label{tab:data_split}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tập dữ liệu} & \textbf{Số lượng mẫu} & \textbf{Tỷ lệ (\%)} \\
+\hline
+Training (Train) & 11,660 & 93.88\% \\
+\hline
+Testing (Test) & 760 & 6.12\% \\
+\hline
+\textbf{Tổng cộng} & \textbf{12,420} & \textbf{100\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Lưu ý về Validation Set}: Trong quá trình fine-tuning PhoWhisper, 200 mẫu từ tập Test được sử dụng làm validation để theo dõi quá trình huấn luyện.
+
+\subsection{Lý do chọn tỷ lệ chia dữ liệu}
+
+\begin{enumerate}
+    \item \textbf{Sử dụng tỷ lệ có sẵn của VIVOS}: Bộ dữ liệu VIVOS đã được các nhà phát triển chia sẵn theo tỷ lệ $\approx$ 94/6 (train/test). Việc giữ nguyên cách chia này đảm bảo tính nhất quán với các nghiên cứu trước đó sử dụng cùng bộ dữ liệu.
+    
+    \item \textbf{Tối đa hóa dữ liệu huấn luyện}: Với tổng số 12,420 mẫu, việc dành phần lớn dữ liệu (93.88\%) cho huấn luyện giúp mô hình học được nhiều biến thể ngôn ngữ và giọng nói hơn.
+    
+    \item \textbf{Tập Test đủ lớn để đánh giá}: 760 mẫu test đủ để đánh giá hiệu năng mô hình một cách đáng tin cậy, bao gồm nhiều speaker và nội dung khác nhau.
+\end{enumerate}
+
+\subsection{Phân tích Chất lượng Dữ liệu}
+
+\begin{itemize}
+    \item \textbf{Chất lượng audio}: Các file audio trong VIVOS được ghi âm trong môi trường phòng yên tĩnh với microphone chất lượng cao, đảm bảo tín hiệu sạch, ít nhiễu.
+    
+    \item \textbf{Tính nhất quán}: Tất cả các file đều có cùng định dạng WAV, tần số lấy mẫu 16kHz, giúp quá trình tiền xử lý đơn giản và đồng nhất.
+    
+    \item \textbf{Transcript chính xác}: Các câu văn bản được chuẩn bị sẵn và người đọc đọc theo đúng nội dung, đảm bảo nhãn (label) chính xác.
+    
+    \item \textbf{Giọng vùng miền}: Dữ liệu chủ yếu là giọng miền Nam Việt Nam, có thể là hạn chế khi áp dụng cho các vùng miền khác.
+\end{itemize}

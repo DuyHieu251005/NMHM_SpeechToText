@@ -1,0 +1,71 @@
+\chapter{Giới thiệu}
+
+\section{Phân tích Vấn đề (Problem Definition)}
+
+Trong lĩnh vực Xử lý Ngôn ngữ Tự nhiên (NLP) và Xử lý Tín hiệu, dự án này giải quyết bài toán \textbf{Nhận dạng Tiếng nói Tiếng Việt Tự động (Vietnamese Automatic Speech Recognition - ASR)}. Mục tiêu chính là xây dựng một hệ thống học máy có khả năng chuyển đổi tín hiệu giọng nói của con người thành dạng văn bản tương ứng với độ chính xác cao.
+
+\subsection{Tính cấp thiết của vấn đề}
+
+Trong bối cảnh Việt Nam hiện nay, nhu cầu về công nghệ nhận dạng giọng nói ngày càng tăng cao:
+\begin{itemize}
+    \item \textbf{Chuyển đổi số}: Nhiều doanh nghiệp và tổ chức đang đẩy mạnh số hóa, cần công cụ chuyển đổi giọng nói thành văn bản tự động.
+    \item \textbf{Hỗ trợ người khuyết tật}: Người khiếm thính cần công cụ chuyển đổi giọng nói thành phụ đề trong các cuộc họp, hội nghị.
+    \item \textbf{Ứng dụng thực tiễn}: Trợ lý ảo, ghi chép tự động, điều khiển thiết bị bằng giọng nói.
+    \item \textbf{Đặc thù tiếng Việt}: Tiếng Việt có hệ thống thanh điệu phức tạp (6 thanh), nhiều phương ngữ vùng miền, tạo ra thách thức lớn cho các hệ thống ASR.
+\end{itemize}
+
+\subsection{Định nghĩa bài toán}
+
+Một cách hình thức, bài toán ASR có thể được định nghĩa là tìm chuỗi từ có khả năng xảy ra cao nhất $\hat{W}$ với đầu vào là chuỗi các đặc trưng âm thanh $X$. Bài toán này được mô hình hóa dưới dạng bài toán phân loại xác suất, trong đó chúng ta tìm cách tối đa hóa xác suất hậu nghiệm:
+
+\begin{equation}
+    \hat{W} = \operatorname*{argmax}_{W} P(W|X)
+\end{equation}
+
+Trong đó:
+\begin{itemize}
+    \item $X = \{x_1, x_2, \dots, x_T\}$ đại diện cho chuỗi các vector đặc trưng âm thanh được trích xuất từ đầu vào âm thanh thô (ví dụ: MFCC hoặc Spectrogram).
+    \item $W = \{w_1, w_2, \dots, w_N\}$ đại diện cho chuỗi các từ trong câu mục tiêu.
+    \item $P(W|X)$ là xác suất của chuỗi từ $W$ khi biết quan sát âm thanh $X$.
+\end{itemize}
+
+\section{Mục tiêu của Đồ án}
+
+Các mục tiêu cụ thể mà nhóm hướng tới giải quyết:
+
+\begin{enumerate}
+    \item \textbf{Xây dựng hệ thống ASR cho tiếng Việt}: Phát triển một hệ thống nhận dạng giọng nói tự động có khả năng chuyển đổi âm thanh tiếng Việt thành văn bản với độ chính xác cao.
+    
+    \item \textbf{So sánh các kiến trúc mô hình}: Thử nghiệm và so sánh ít nhất 3 mô hình deep learning khác nhau (Wav2Vec2, PhoWhisper, OpenAI Whisper) để đánh giá hiệu năng và tìm ra mô hình phù hợp nhất.
+    
+    \item \textbf{Fine-tuning trên dữ liệu Việt Nam}: Tinh chỉnh các mô hình pretrained trên bộ dữ liệu VIVOS để cải thiện khả năng nhận dạng tiếng Việt.
+    
+    \item \textbf{Triển khai ứng dụng thực tế}: Xây dựng ứng dụng web hoặc giao diện người dùng cho phép sử dụng mô hình trong thực tế.
+    
+    \item \textbf{Đánh giá và phân tích}: Sử dụng các chỉ số chuẩn (WER - Word Error Rate) để đánh giá và phân tích chi tiết kết quả.
+\end{enumerate}
+
+\section{Tổng quan về Phương pháp}
+
+Quy trình thực hiện đồ án được tổ chức như sau:
+
+\begin{enumerate}
+    \item \textbf{Thu thập dữ liệu}: Sử dụng bộ dữ liệu VIVOS - bộ dữ liệu tiếng Việt chuẩn với 15 giờ audio, được ghi âm trong môi trường yên tĩnh với chất lượng cao.
+    
+    \item \textbf{Tiền xử lý dữ liệu}:
+    \begin{itemize}
+        \item Xử lý audio: Resampling về 16kHz, trích xuất đặc trưng (Log-Mel Spectrogram hoặc waveform).
+        \item Xử lý text: Chuẩn hóa văn bản, tokenization phù hợp với từng mô hình.
+    \end{itemize}
+    
+    \item \textbf{Lựa chọn và xây dựng mô hình}:
+    \begin{itemize}
+        \item \textbf{Wav2Vec2}: Mô hình Self-Supervised Learning với kiến trúc Encoder-only sử dụng CTC Loss.
+        \item \textbf{PhoWhisper}: Phiên bản Whisper được fine-tune đặc biệt cho tiếng Việt bởi VinAI.
+        \item \textbf{OpenAI Whisper}: Mô hình đa ngôn ngữ SOTA với kiến trúc Encoder-Decoder.
+    \end{itemize}
+    
+    \item \textbf{Huấn luyện và đánh giá}: Fine-tune các mô hình trên tập train của VIVOS, đánh giá trên tập test bằng chỉ số WER.
+    
+    \item \textbf{Triển khai sản phẩm}: Xây dựng ứng dụng web/desktop cho phép người dùng upload file audio hoặc ghi âm trực tiếp để chuyển đổi thành văn bản.
+\end{enumerate}

@@ -1,0 +1,114 @@
+\chapter{Xây dựng và Triển khai Ứng dụng}
+
+\section{Kiến trúc Hệ thống}
+% Mô tả kiến trúc tổng thể của ứng dụng, cách mô hình được đóng gói và tích hợp.
+
+\textit{[Điền nội dung tại đây]}
+
+% Chèn sơ đồ kiến trúc hệ thống
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{img/system_architecture.png}
+%     \caption{Kiến trúc tổng thể của hệ thống}
+%     \label{fig:system_arch}
+% \end{figure}
+
+\textbf{Các thành phần chính:}
+\begin{enumerate}
+    \item \textbf{Frontend:} ...
+    \item \textbf{Backend:} ...
+    \item \textbf{Model Service:} ...
+    \item \textbf{Database (nếu có):} ...
+\end{enumerate}
+
+\textbf{Cách đóng gói mô hình:} ...
+
+\textbf{Cách tích hợp mô hình với ứng dụng:} ...
+
+\section{Giao diện và Chức năng}
+
+\subsection{Giao diện Người dùng (UI)}
+% Mô tả giao diện người dùng (UI) và các chức năng chính.
+
+\textit{[Điền nội dung tại đây]}
+
+% Chèn hình ảnh giao diện
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{img/ui_screenshot_1.png}
+%     \caption{Giao diện trang chủ}
+%     \label{fig:ui_home}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{img/ui_screenshot_2.png}
+%     \caption{Giao diện chức năng chính}
+%     \label{fig:ui_main}
+% \end{figure}
+
+\subsection{Các Chức năng Chính}
+
+\textit{[Điền nội dung tại đây]}
+
+\begin{enumerate}
+    \item \textbf{Chức năng 1:} Mô tả chi tiết
+    \item \textbf{Chức năng 2:} Mô tả chi tiết
+    \item \textbf{Chức năng 3:} Mô tả chi tiết
+\end{enumerate}
+
+\section{Triển khai}
+% Nêu rõ nền tảng triển khai (cloud công khai hoặc local).
+
+\textit{[Điền nội dung tại đây]}
+
+\subsection{Nền tảng Triển khai}
+
+\textbf{Loại triển khai:} Cloud công khai / Local
+
+% ===== NẾU TRIỂN KHAI TRÊN CLOUD =====
+\subsection{Triển khai trên Cloud (nếu áp dụng)}
+% Nếu triển khai trên nền tảng cloud công khai: Cung cấp đường dẫn URL của ứng dụng đang hoạt động.
+
+\textbf{Nền tảng cloud sử dụng:} (Ví dụ: Heroku, AWS, Google Cloud, Azure, ...)
+
+\textbf{URL ứng dụng:} \url{https://your-app-url.com}
+
+% ===== NẾU TRIỂN KHAI LOCAL =====
+\subsection{Triển khai Local (nếu áp dụng)}
+% Nếu triển khai local: Cung cấp hướng dẫn chi tiết (các bước cài đặt, câu lệnh chạy) để có thể chạy ứng dụng trên máy local.
+
+\textbf{Yêu cầu hệ thống:}
+\begin{itemize}
+    \item Python: phiên bản X.X
+    \item RAM: tối thiểu X GB
+    \item GPU: (nếu cần)
+    \item Các dependencies khác: ...
+\end{itemize}
+
+\textbf{Hướng dẫn cài đặt và chạy:}
+
+\begin{enumerate}
+    \item \textbf{Clone repository:}
+    \begin{lstlisting}[style=mystyle]
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+    \end{lstlisting}
+    
+    \item \textbf{Tạo môi trường ảo và cài đặt dependencies:}
+    \begin{lstlisting}[style=mystyle]
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# hoặc venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+    \end{lstlisting}
+    
+    \item \textbf{Chạy ứng dụng:}
+    \begin{lstlisting}[style=mystyle]
+python app.py
+# hoặc
+streamlit run app.py
+    \end{lstlisting}
+    
+    \item \textbf{Truy cập ứng dụng:} Mở trình duyệt và truy cập \url{http://localhost:8000}
+\end{enumerate}

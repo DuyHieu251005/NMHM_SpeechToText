@@ -1,0 +1,59 @@
+\documentclass[12pt, a4paper]{report}
+
+%---------------CHOOSE PACKAGE---------------%
+% English report
+%\usepackage{package/dak_en_report}
+
+%Vietnamese report
+\usepackage{package/dak_vn_report}
+
+\fancyhead[L]{BÁO CÁO CUỐI KỲ} 
+\fancyhead[R]{Nhập môn Học máy}
+\fancyfoot[R]{\thepage}
+
+%---------------DOCUMENT---------------%
+\begin{document}
+%---------------COVER---------------%
+\covertitle{Nhập môn học máy}
+\projectname{BÁO CÁO CUỐI KỲ}
+\info{\textbf {Đồ án được thực hiện bởi} \\[0.5cm]
+            Đặng Anh Kiệt - 23127077 - 23KHMT \\
+            Phạm Minh Triết - 23127132 - 23KHMT \\
+            Trần Quang Phúc - 23127302 - 23KHMT \\
+            Kiều Duy Hiếu - 23127365 - 23KHMT \\
+            [1cm]
+         \textbf {Supervised by} \\[0.5cm]
+         Bùi Tiến Lên \\
+         Lê Nhựt Nam \\
+         Võ Nhật Tân 
+}
+\makecover{}
+
+%---------------TABLE OF CONTENTS---------------%
+\pagebreak
+\tableofcontents
+\pagebreak
+
+%---------------THÔNG TIN NHÓM---------------%
+\input{chapter/team_info.tex}
+\pagebreak
+
+%---------------CONTENT---------------%
+\input{chapter/chapter1_intro.tex}
+\pagebreak
+\input{chapter/chapter2_data.tex}
+\pagebreak
+\input{chapter/chapter3_model.tex}
+\pagebreak
+\input{chapter/chapter4_results.tex}
+\pagebreak
+\input{chapter/chapter5_deployment.tex}
+\pagebreak
+\input{chapter/chapter6_conclusion.tex}
+
+%---------------BIBLIOGRAPHY---------------%
+\pagebreak
+\nocite{*}
+\printbibliography
+
+\end{document}

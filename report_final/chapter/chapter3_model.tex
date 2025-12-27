@@ -1,0 +1,314 @@
+\chapter{Lựa chọn và Huấn luyện Mô hình}
+
+\section{Chuẩn bị Dữ liệu cho Mô hình}
+
+\subsection{Chia tập dữ liệu}
+
+Sử dụng cách chia có sẵn của bộ dữ liệu VIVOS:
+
+\begin{table}[H]
+\centering
+\caption{Tỷ lệ chia tập dữ liệu}
+\label{tab:data_split_model}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tập dữ liệu} & \textbf{Số lượng} & \textbf{Tỷ lệ (\%)} \\
+\hline
+Train & 11,660 & 93.88\% \\
+\hline
+Validation (từ Test) & 200 & 1.61\% \\
+\hline
+Test & 560 & 4.51\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Lý do chọn tỷ lệ:}
+\begin{itemize}
+    \item Giữ nguyên tỷ lệ gốc của VIVOS để đảm bảo tính so sánh với các nghiên cứu khác.
+    \item Tối đa hóa dữ liệu huấn luyện vì sử dụng pretrained models.
+    \item Tách 200 mẫu từ tập Test làm Validation để theo dõi quá trình huấn luyện.
+\end{itemize}
+
+\subsection{Tiền xử lý Cuối cùng}
+
+Các bước tiền xử lý cuối cùng trước khi đưa vào mô hình:
+
+\begin{enumerate}
+    \item \textbf{Audio Processing}: 
+    \begin{itemize}
+        \item Resampling về 16kHz
+        \item Trích xuất đặc trưng phù hợp với từng mô hình
+    \end{itemize}
+    
+    \item \textbf{Text Processing}:
+    \begin{itemize}
+        \item Chuẩn hóa về lowercase
+        \item Tokenization theo từng mô hình
+    \end{itemize}
+    
+    \item \textbf{Batching và Padding}: Sử dụng Data Collator để xử lý batch
+\end{enumerate}
+
+\section{Lựa chọn và Kiến trúc Mô hình}
+
+\subsection{Các Mô hình Thử nghiệm}
+
+Đồ án thử nghiệm 3 mô hình deep learning cho bài toán ASR:
+
+\subsubsection{Mô hình 1: Wav2Vec2}
+
+\textbf{Đại diện cho Kiến trúc Self-Supervised Learning (SSL)}
+
+\begin{itemize}
+    \item \textbf{Mô tả}: Wav2Vec2 sử dụng cơ chế CTC (Connectionist Temporal Classification) và Self-Supervised Learning. Đây là kiến trúc Encoder-only, khác biệt với kiến trúc Encoder-Decoder của Whisper.
+    
+    \item \textbf{Ưu điểm}:
+    \begin{itemize}
+        \item Nhẹ hơn và có độ trễ (latency) thấp hơn Whisper trong suy luận
+        \item Lý tưởng cho triển khai trên thiết bị giới hạn tài nguyên
+        \item Trước khi Whisper ra mắt, đây là chuẩn mực SOTA
+    \end{itemize}
+    
+    \item \textbf{Nhược điểm}:
+    \begin{itemize}
+        \item Hiệu năng thấp hơn so với các mô hình Encoder-Decoder mới
+        \item Yêu cầu vocabulary riêng cho từng ngôn ngữ
+    \end{itemize}
+    
+    \item \textbf{Pretrained model}: \texttt{nguyenvulebinh/wav2vec2-base-vietnamese-250h}
+\end{itemize}
+
+\subsubsection{Mô hình 2: PhoWhisper}
+
+\textbf{Đại diện cho sự "Thích nghi ngôn ngữ" (Language Adaptation)}
+
+\begin{itemize}
+    \item \textbf{Mô tả}: PhoWhisper là phiên bản Whisper được VinAI fine-tune trên tập dữ liệu tiếng Việt lớn. Đây là phiên bản cải tiến chuyên biệt, chứng minh tầm quan trọng của việc tối ưu hóa cho tiếng Việt.
+    
+    \item \textbf{Ưu điểm}:
+    \begin{itemize}
+        \item Được tối ưu hóa đặc biệt cho tiếng Việt
+        \item Khắc phục nhược điểm về dấu câu và từ vựng đặc thù Việt Nam của Whisper gốc
+        \item Tính ứng dụng thực tế cao tại Việt Nam
+    \end{itemize}
+    
+    \item \textbf{Nhược điểm}:
+    \begin{itemize}
+        \item Chỉ hỗ trợ tiếng Việt
+        \item Kích thước mô hình lớn hơn Wav2Vec2
+    \end{itemize}
+    
+    \item \textbf{Pretrained model}: \texttt{vinai/PhoWhisper-small}
+\end{itemize}
+
+\subsubsection{Mô hình 3: OpenAI Whisper}
+
+\textbf{Đại diện cho SOTA (State-of-the-art) và Tính Đa Nhiệm}
+
+\begin{itemize}
+    \item \textbf{Mô tả}: Whisper là mô hình "Baseline" mạnh mẽ nhất hiện nay. Sử dụng kiến trúc Encoder-Decoder (Seq2Seq) được huấn luyện trên 680,000 giờ dữ liệu đa ngôn ngữ.
+    
+    \item \textbf{Ưu điểm}:
+    \begin{itemize}
+        \item Kiến trúc Transformer quy mô lớn, công nghệ tiên tiến nhất
+        \item Khả năng Robustness (Chống nhiễu) cực kỳ mạnh mẽ
+        \item Zero-shot Learning: Có thể nhận dạng tiếng Việt mà không cần fine-tune
+    \end{itemize}
+    
+    \item \textbf{Nhược điểm}:
+    \begin{itemize}
+        \item Đôi khi gặp lỗi về dấu câu hoặc từ vựng đặc thù Việt Nam
+        \item Kích thước mô hình lớn, yêu cầu tài nguyên tính toán cao
+    \end{itemize}
+    
+    \item \textbf{Pretrained model}: \texttt{openai/whisper-tiny}
+\end{itemize}
+
+\subsection{Kiến trúc Mô hình Được Chọn}
+
+\subsubsection{Kiến trúc OpenAI Whisper và PhoWhisper}
+
+% Chèn sơ đồ kiến trúc
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.85\textwidth]{img/whisper_AD.png}
+%     \caption{Sơ đồ kiến trúc OpenAI Whisper / PhoWhisper}
+%     \label{fig:whisper_arch}
+% \end{figure}
+
+\textbf{Số lượng tham số}: Sử dụng mô hình kích thước \textbf{tiny/small} với \textbf{39 Triệu} tham số.
+
+\textbf{Các thành phần chính}:
+\begin{itemize}
+    \item \textbf{2 x Conv1d + GELU activation}: Trích xuất đặc trưng từ log-Mel spectrogram đầu vào
+    \item \textbf{Positional Embedding}: Sử dụng sinusoidal positional embedding để mã hóa vị trí của từng token
+    \item \textbf{Encoder}: Xử lý đặc trưng audio
+    \item \textbf{Decoder}: Sinh ra chuỗi văn bản đầu ra
+\end{itemize}
+
+\subsubsection{Kiến trúc Wav2Vec2}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.85\textwidth]{img/w2v2_AD.png}
+%     \caption{Sơ đồ kiến trúc Wav2Vec2}
+%     \label{fig:wav2vec2_arch}
+% \end{figure}
+
+\textbf{Số lượng tham số}: Sử dụng mô hình kích thước \textbf{base} với \textbf{95 Triệu} tham số.
+
+\textbf{Các thành phần chính}:
+\begin{itemize}
+    \item \textbf{Feature Encoder}: CNN layers để trích xuất đặc trưng từ waveform thô
+    \item \textbf{Transformer Encoder}: Xử lý và mã hóa đặc trưng
+    \item \textbf{CTC Head}: Lớp đầu ra cho CTC Loss
+\end{itemize}
+
+\section{Cấu hình Huấn luyện}
+
+\subsection{Hàm Mất mát}
+
+\subsubsection{Wav2Vec2}
+
+Sử dụng phối hợp giữa \textbf{InfoNCE Loss}, \textbf{Diversity Loss} và \textbf{CTC Loss}:
+
+\begin{itemize}
+    \item \textbf{InfoNCE Loss}: Dùng trong giai đoạn Self-Supervised Pretraining. Buộc mô hình hiểu nội dung cao cấp (âm vị, ngữ điệu) để phân biệt đoạn âm thanh "đúng" và nhiễu.
+    
+    \item \textbf{Diversity Loss}: Ngăn chặn hiện tượng "Codebook Collapse" (Mode Collapse) trong quá trình pretraining.
+    
+    \item \textbf{CTC Loss (Connectionist Temporal Classification)}: Dùng trong giai đoạn Supervised Fine-tuning. Đây là tiêu chuẩn vàng cho bài toán Sequence-to-Sequence trong ASR khi không có alignment info.
+\end{itemize}
+
+\subsubsection{PhoWhisper và OpenAI Whisper}
+
+Sử dụng \textbf{Cross-Entropy Loss} trên đầu ra sequence-to-sequence:
+\begin{itemize}
+    \item Padding token được thay bằng (-100) để không tính vào loss
+    \item Đánh giá bằng \textbf{WER (Word Error Rate)}
+\end{itemize}
+
+\subsection{Thuật toán Tối ưu}
+
+\begin{table}[H]
+\centering
+\caption{Thuật toán tối ưu cho các mô hình}
+\label{tab:optimizer}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Mô hình} & \textbf{Optimizer} & \textbf{Scheduler} \\
+\hline
+Wav2Vec2 & AdamW & Warm-up rồi decay \\
+\hline
+PhoWhisper & AdamW & Scheduler decay \\
+\hline
+OpenAI Whisper & AdamW & Warm-up rồi decay \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Siêu tham số}
+
+\subsubsection{Wav2Vec2}
+
+\begin{table}[H]
+\centering
+\caption{Siêu tham số Wav2Vec2}
+\label{tab:wav2vec2_params}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Siêu tham số} & \textbf{Giá trị} \\
+\hline
+train\_batch\_size & 4 \\
+\hline
+num\_train\_epochs & 5 \\
+\hline
+max\_steps & 3645 \\
+\hline
+logging\_steps & 50 \\
+\hline
+save\_steps & 400 \\
+\hline
+eval\_steps & 200 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{PhoWhisper}
+
+\begin{table}[H]
+\centering
+\caption{Siêu tham số PhoWhisper}
+\label{tab:phowhisper_params}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Siêu tham số} & \textbf{Giá trị} \\
+\hline
+per\_device\_train\_batch\_size & 4 \\
+\hline
+gradient\_accumulation\_steps & 4 \\
+\hline
+learning\_rate & 1e-3 \\
+\hline
+max\_steps & 500 \\
+\hline
+fp16 & True \\
+\hline
+save\_steps / eval\_steps & 100 \\
+\hline
+logging\_steps & 50 \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Tinh chỉnh LoRA (Low-Rank Adaptation)}:
+\begin{itemize}
+    \item r = 32
+    \item lora\_alpha = 64
+    \item target\_modules = ["q\_proj", "v\_proj"]
+    \item lora\_dropout = 0.05
+    \item bias = "none"
+\end{itemize}
+
+\subsubsection{OpenAI Whisper}
+
+\begin{table}[H]
+\centering
+\caption{Siêu tham số OpenAI Whisper}
+\label{tab:whisper_params}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Siêu tham số} & \textbf{Giá trị} \\
+\hline
+per\_device\_train\_batch\_size & 16 \\
+\hline
+gradient\_accumulation\_steps & 1 \\
+\hline
+learning\_rate & 1e-5 \\
+\hline
+warmup\_steps & 100 \\
+\hline
+num\_train\_epochs & 15 \\
+\hline
+fp16 & True \\
+\hline
+per\_device\_eval\_batch\_size & 8 \\
+\hline
+generation\_max\_length & 225 \\
+\hline
+metric\_for\_best\_model & wer \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Phương pháp Tinh chỉnh Tham số}
+
+\textbf{Phương pháp sử dụng}: Tinh chỉnh thủ công (Manual Tuning)
+
+Lý do:
+\begin{itemize}
+    \item Sử dụng các mô hình pretrained, chỉ cần fine-tune với learning rate nhỏ
+    \item Tham khảo các siêu tham số từ các nghiên cứu trước đó trên VIVOS
+    \item Điều chỉnh dựa trên quan sát Learning Curves trong quá trình huấn luyện
+\end{itemize}
