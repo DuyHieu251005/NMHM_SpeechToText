@@ -3,128 +3,208 @@
 \section{Kết quả Thực nghiệm}
 
 \subsection{Quá trình Học (Learning Curves)}
-% Trình bày biểu đồ quá trình học (Learning Curves: Loss, Accuracy,...) trên tập Train và Validation, kèm theo nhận xét.
 
-\textit{[Điền nội dung tại đây]}
+Trong phần này, chúng tôi trình bày biểu đồ quá trình học của hai mô hình đã được fine-tune: Wav2Vec2 và PhoWhisper.
 
-% Chèn biểu đồ Learning Curves
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{img/learning_curves.png}
-%     \caption{Biểu đồ quá trình học (Loss và Accuracy)}
-%     \label{fig:learning_curves}
-% \end{figure}
+\subsubsection{Wav2Vec2}
 
-\textbf{Nhận xét:}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/wav2vec2_learning_curves.png}
+    \caption{Biểu đồ quá trình học của Wav2Vec2: Training/Validation Loss và WER}
+    \label{fig:wav2vec2_learning}
+\end{figure}
+
+\textbf{Nhận xét về Wav2Vec2:}
 \begin{itemize}
-    \item Về Loss: ...
-    \item Về Accuracy: ...
-    \item Về sự hội tụ: ...
+    \item \textbf{Về Loss:} Training loss bắt đầu rất cao ($\approx$14.4) ở bước đầu tiên do mô hình chưa được tinh chỉnh cho tiếng Việt. Sau đó giảm nhanh chóng xuống dưới 1.0 sau 1000 steps và tiếp tục giảm dần, đạt khoảng 0.2 ở cuối quá trình huấn luyện.
+    
+    \item \textbf{Về WER:} WER bắt đầu ở mức 100\% (mô hình không thể nhận dạng) và giảm đáng kể sau khoảng 800-1000 steps. WER cuối cùng đạt \textbf{11.28\%} sau 3645 steps (5 epochs).
+    
+    \item \textbf{Về sự hội tụ:} Mô hình hội tụ tốt, không có dấu hiệu overfitting rõ ràng vì eval loss và train loss đều giảm song song. Tuy nhiên, sau epoch 4, WER có xu hướng ổn định, cho thấy có thể dừng sớm hơn.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/wav2vec2_wer_improvement.png}
+    \caption{Sự cải thiện WER của Wav2Vec2 trong quá trình huấn luyện}
+    \label{fig:wav2vec2_wer}
+\end{figure}
+
+\subsubsection{PhoWhisper}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/phowhisper_learning_curves.png}
+    \caption{Biểu đồ quá trình học của PhoWhisper: Training/Validation Loss}
+    \label{fig:phowhisper_learning}
+\end{figure}
+
+\textbf{Nhận xét về PhoWhisper:}
+\begin{itemize}
+    \item \textbf{Về Loss:} Training loss giảm nhanh từ 4.4 xuống dưới 0.3 chỉ sau 500 steps nhờ sử dụng kỹ thuật LoRA (Low-Rank Adaptation) với learning rate cao (1e-3).
+    
+    \item \textbf{Về đặc điểm:} PhoWhisper đã được pretrain trên lượng dữ liệu tiếng Việt lớn bởi VinAI, nên chỉ cần fine-tune nhẹ với LoRA. Eval WER trong log không chính xác do cách tính khác biệt; kết quả đánh giá thực tế là \textbf{32.89\%} trên 200 mẫu test.
+    
+    \item \textbf{Về sự hội tụ:} Loss hội tụ nhanh, cho thấy LoRA hiệu quả trong việc tinh chỉnh mô hình lớn với ít tham số cần cập nhật.
 \end{itemize}
 
 \subsection{Các Chỉ số Đánh giá trên Tập Test}
-% Báo cáo các chỉ số đánh giá (Accuracy, Precision, Recall, F1-Score, RMSE,...) trên tập Test.
 
-\textit{[Điền nội dung tại đây]}
+Chỉ số đánh giá chính được sử dụng là \textbf{Word Error Rate (WER)} - tỷ lệ lỗi từ, được tính theo công thức:
+
+\begin{equation}
+    WER = \frac{S + D + I}{N} \times 100\%
+\end{equation}
+
+Trong đó: S = số từ thay thế sai, D = số từ bị xóa, I = số từ bị thêm, N = tổng số từ trong câu gốc.
 
 \begin{table}[H]
 \centering
-\caption{Kết quả đánh giá trên tập Test}
+\caption{Kết quả đánh giá các mô hình trên tập Test VIVOS}
 \label{tab:test_results}
-\begin{tabular}{|l|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Chỉ số} & \textbf{Giá trị} \\
+\textbf{Mô hình} & \textbf{WER (\%)} & \textbf{CER (\%)} & \textbf{Số mẫu test} \\
 \hline
-Accuracy & ... \\
+Wav2Vec2 (Fine-tuned) & \textbf{11.28} & - & 760 \\
 \hline
-Precision & ... \\
+PhoWhisper (Fine-tuned) & 32.89 & 12.12 & 200 \\
 \hline
-Recall & ... \\
-\hline
-F1-Score & ... \\
+OpenAI Whisper (Zero-shot) & $\approx$85.0 & - & 760 \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Ma trận Nhầm lẫn (Confusion Matrix)}
-% Hiển thị và phân tích ma trận nhầm lẫn
-
-\textit{[Điền nội dung tại đây]}
-
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.7\textwidth]{img/confusion_matrix.png}
-%     \caption{Ma trận nhầm lẫn trên tập Test}
-%     \label{fig:confusion_matrix}
-% \end{figure}
-
-\textbf{Phân tích:}
+\textbf{Ghi chú:}
 \begin{itemize}
-    \item Các lớp dự đoán tốt: ...
-    \item Các lớp thường bị nhầm lẫn: ...
-    \item Nguyên nhân có thể: ...
+    \item \textbf{CER (Character Error Rate)}: Tỷ lệ lỗi ký tự, chỉ được tính cho PhoWhisper.
+    \item \textbf{Zero-shot}: OpenAI Whisper được đánh giá mà không fine-tune, chỉ sử dụng model gốc.
+\end{itemize}
+
+\subsection{Phân tích Kết quả Chi tiết}
+
+Dựa trên file kết quả đánh giá, chúng tôi phân tích một số trường hợp điển hình:
+
+\textbf{Wav2Vec2 - Các trường hợp nhận dạng tốt:}
+\begin{itemize}
+    \item "trở nên thụ động" $\rightarrow$ "trở nên thụ động" (\checkmark)
+    \item "các vụ tham nhũng và bê bối kinh tế" $\rightarrow$ "các vụ tham nhũng và bê bối kinh tế" (\checkmark)
+    \item "vai trò của chế độ dinh dưỡng" $\rightarrow$ "vai trò của chế độ dinh dưỡng" (\checkmark)
+\end{itemize}
+
+\textbf{Wav2Vec2 - Các trường hợp nhận dạng sai:}
+\begin{itemize}
+    \item "điện thoại reng" $\rightarrow$ "điện thải len dên" (lỗi âm tương tự)
+    \item "mày dám chơi vợ tao" $\rightarrow$ "mày dám chê vợ tao" (lỗi dấu thanh)
+\end{itemize}
+
+\textbf{OpenAI Whisper (Zero-shot) - Vấn đề nghiêm trọng:}
+\begin{itemize}
+    \item "cũng khiến cho họ dè dặt" $\rightarrow$ "cũng khuấn cho họ giề giả giả giả giả giả" (lặp từ)
+    \item "điện thoại reng" $\rightarrow$ "tiện thể lan nhân" (hoàn toàn sai)
 \end{itemize}
 
 \section{So sánh và Thảo luận}
 
 \subsection{So sánh Hiệu năng Các Mô hình}
-% Lập bảng so sánh hiệu năng giữa các mô hình đã thử nghiệm.
 
-\textit{[Điền nội dung tại đây]}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/model_comparison_wer.png}
+    \caption{So sánh WER giữa các mô hình trên tập Test VIVOS}
+    \label{fig:model_comparison}
+\end{figure}
 
 \begin{table}[H]
 \centering
-\caption{So sánh hiệu năng các mô hình}
+\caption{So sánh chi tiết các mô hình}
 \label{tab:model_comparison}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-\textbf{Mô hình} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\
+\textbf{Mô hình} & \textbf{WER (\%)} & \textbf{Params} & \textbf{Training Time} & \textbf{Inference Speed} \\
 \hline
-Mô hình 1 & ... & ... & ... & ... \\
+Wav2Vec2 & \textbf{11.28} & 95M & 5 epochs & Nhanh \\
 \hline
-Mô hình 2 & ... & ... & ... & ... \\
+PhoWhisper & 32.89 & 39M (+LoRA) & 500 steps & Trung bình \\
 \hline
-Mô hình 3 & ... & ... & ... & ... \\
+OpenAI Whisper & $\approx$85.0 & 39M & - & Trung bình \\
 \hline
 \end{tabular}
 \end{table}
 
-\textbf{Nhận xét:} ...
+\textbf{Nhận xét:}
+\begin{itemize}
+    \item \textbf{Wav2Vec2} cho kết quả tốt nhất (WER 11.28\%) nhờ được pretrain trên 250 giờ dữ liệu tiếng Việt và fine-tune kỹ trên VIVOS. Kiến trúc CTC phù hợp với bài toán ASR có alignment.
+    
+    \item \textbf{PhoWhisper} đạt WER 32.89\% dù chỉ fine-tune 500 steps với LoRA. Kết quả này có thể cải thiện nếu huấn luyện lâu hơn hoặc sử dụng toàn bộ tập test để đánh giá.
+    
+    \item \textbf{OpenAI Whisper} (zero-shot) cho kết quả kém nhất ($\approx$85\% WER) vì mặc dù được train trên dữ liệu đa ngôn ngữ, tiếng Việt chỉ chiếm phần nhỏ và mô hình tiny có capacity hạn chế.
+\end{itemize}
 
 \subsection{Phân tích Overfitting/Underfitting}
-% Phân tích hiện tượng Overfitting/Underfitting và các biện pháp đã áp dụng.
 
-\textit{[Điền nội dung tại đây]}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/train_loss_comparison.png}
+    \caption{So sánh Training Loss giữa Wav2Vec2 và PhoWhisper}
+    \label{fig:loss_comparison}
+\end{figure}
 
 \textbf{Hiện tượng quan sát được:}
 \begin{itemize}
-    \item Overfitting: Có/Không - Mô tả dấu hiệu
-    \item Underfitting: Có/Không - Mô tả dấu hiệu
+    \item \textbf{Overfitting}: Không có dấu hiệu overfitting rõ ràng ở cả hai mô hình. Eval loss và train loss đều giảm song song trong suốt quá trình huấn luyện.
+    
+    \item \textbf{Underfitting}: OpenAI Whisper (zero-shot) có hiện tượng underfitting nghiêm trọng do không được fine-tune cho tiếng Việt.
 \end{itemize}
 
 \textbf{Các biện pháp đã áp dụng:}
 \begin{enumerate}
-    \item Biện pháp 1: ...
-    \item Biện pháp 2: ...
-    \item Biện pháp 3: ...
+    \item \textbf{Learning Rate Scheduling}: Sử dụng warm-up rồi decay để tránh học quá nhanh ban đầu.
+    \item \textbf{LoRA}: Áp dụng cho PhoWhisper để giảm số tham số cần update, tránh overfitting.
+    \item \textbf{Early Stopping}: Quan sát eval metrics để dừng khi cần thiết.
+    \item \textbf{Gradient Accumulation}: Tăng effective batch size mà không cần nhiều VRAM.
 \end{enumerate}
 
 \subsection{Phân tích Trường hợp Dự đoán Sai}
-% Phân tích các trường hợp dự đoán sai điển hình và đưa ra giả thuyết nguyên nhân.
 
-\textit{[Điền nội dung tại đây]}
+Dựa trên phân tích kết quả, chúng tôi xác định các loại lỗi phổ biến:
 
-\textbf{Các trường hợp điển hình:}
+\begin{table}[H]
+\centering
+\caption{Phân loại các lỗi nhận dạng}
+\label{tab:error_analysis}
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Loại lỗi} & \textbf{Ví dụ} & \textbf{Nguyên nhân có thể} \\
+\hline
+Lỗi dấu thanh & "dè dặt" $\rightarrow$ "dề giặt" & Thanh điệu tiếng Việt phức tạp \\
+\hline
+Lỗi âm tương tự & "reng" $\rightarrow$ "len dên" & Âm vị giống nhau \\
+\hline
+Lỗi từ vựng & "tham nhũng" $\rightarrow$ "tham nhổng" & OOV hoặc từ hiếm \\
+\hline
+Lỗi lặp từ & "giả" $\rightarrow$ "giả giả giả" & Decoder loop (Whisper) \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Giả thuyết nguyên nhân:}
 \begin{enumerate}
-    \item \textbf{Trường hợp 1:} 
-    \begin{itemize}
-        \item Mô tả: ...
-        \item Giả thuyết nguyên nhân: ...
-    \end{itemize}
+    \item \textbf{Dấu thanh tiếng Việt}: 6 thanh điệu tạo ra sự phức tạp, đặc biệt với các từ có âm tương tự nhưng thanh khác.
     
-    \item \textbf{Trường hợp 2:}
-    \begin{itemize}
-        \item Mô tả: ...
-        \item Giả thuyết nguyên nhân: ...
-    \end{itemize}
+    \item \textbf{Giọng vùng miền}: Dữ liệu VIVOS chủ yếu là giọng miền Nam, có thể khác biệt với các pretrained model được train trên dữ liệu hỗn hợp.
+    
+    \item \textbf{Từ vựng đặc thù}: Các từ lóng, tên riêng, hoặc từ vựng chuyên ngành có thể không có trong vocabulary của mô hình.
+    
+    \item \textbf{Chất lượng audio}: Một số file audio có thể có nhiễu hoặc phát âm không rõ ràng.
 \end{enumerate}
+
+\section{Kết luận Chương}
+
+Kết quả thực nghiệm cho thấy:
+\begin{itemize}
+    \item \textbf{Wav2Vec2} là mô hình tốt nhất cho bài toán ASR tiếng Việt trên VIVOS với WER 11.28\%.
+    \item Fine-tuning đóng vai trò quan trọng: mô hình pretrained đa ngôn ngữ (Whisper) cho kết quả kém nếu không được tinh chỉnh.
+    \item Kỹ thuật LoRA hiệu quả cho việc fine-tune nhanh với tài nguyên hạn chế.
+\end{itemize}

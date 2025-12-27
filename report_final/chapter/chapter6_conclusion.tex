@@ -1,11 +1,8 @@
 \chapter{Kết luận}
 
 \section{Tóm tắt Kết quả}
-% Tóm tắt lại những gì đồ án đã đạt được so với mục tiêu ban đầu.
 
-\textit{[Điền nội dung tại đây]}
-
-So với các mục tiêu đề ra ban đầu:
+Đồ án "Nhận dạng Giọng nói Tiếng Việt sử dụng Học sâu" đã hoàn thành các mục tiêu đề ra với những kết quả cụ thể như sau:
 
 \begin{table}[H]
 \centering
@@ -13,67 +10,125 @@ So với các mục tiêu đề ra ban đầu:
 \label{tab:goal_achievement}
 \begin{tabular}{|p{6cm}|c|p{5cm}|}
 \hline
-\textbf{Mục tiêu} & \textbf{Mức độ hoàn thành} & \textbf{Ghi chú} \\
+\textbf{Mục tiêu} & \textbf{Hoàn thành} & \textbf{Ghi chú} \\
 \hline
-Mục tiêu 1 & ...% & ... \\
+Nghiên cứu và khảo sát các mô hình ASR & 100\% & Khảo sát 3 mô hình: Wav2Vec2, PhoWhisper, OpenAI Whisper \\
 \hline
-Mục tiêu 2 & ...% & ... \\
+Xây dựng pipeline xử lý dữ liệu VIVOS & 100\% & Tiền xử lý 12,420 mẫu audio \\
 \hline
-Mục tiêu 3 & ...% & ... \\
+Fine-tune và đánh giá các mô hình & 100\% & Wav2Vec2 đạt WER 11.28\% \\
+\hline
+Xây dựng ứng dụng demo & 100\% & Flask app với ghi âm realtime và upload file \\
+\hline
+So sánh và phân tích kết quả & 100\% & Đánh giá chi tiết với learning curves \\
 \hline
 \end{tabular}
 \end{table}
 
-\textbf{Tổng kết:}
+\textbf{Các thành tựu chính:}
 \begin{itemize}
-    \item Thành công đạt được: ...
-    \item Các kết quả nổi bật: ...
+    \item \textbf{Mô hình Wav2Vec2:} Đạt WER \textbf{11.28\%} trên tập test VIVOS sau 5 epochs huấn luyện, là kết quả tốt nhất trong 3 mô hình được thử nghiệm.
+    
+    \item \textbf{Mô hình PhoWhisper:} Fine-tune thành công với kỹ thuật LoRA trong 500 steps, đạt WER 32.89\% với chỉ 0.83M tham số cần cập nhật.
+    
+    \item \textbf{Ứng dụng Web:} Xây dựng hoàn chỉnh giao diện web cho phép người dùng ghi âm trực tiếp hoặc upload file audio, hỗ trợ 3 mô hình để so sánh.
+    
+    \item \textbf{Phân tích chuyên sâu:} Thực hiện phân tích learning curves, so sánh hiệu năng, và phân loại các lỗi nhận dạng thường gặp.
+\end{itemize}
+
+\textbf{So sánh với mục tiêu ban đầu:}
+\begin{itemize}
+    \item WER mục tiêu: $<$ 15\% $\rightarrow$ Đạt được: 11.28\% (\checkmark)
+    \item Thời gian inference: $<$ 2s cho audio 10s $\rightarrow$ Đạt được (\checkmark)
+    \item Ứng dụng web hoạt động ổn định $\rightarrow$ Đạt được (\checkmark)
 \end{itemize}
 
 \section{Hạn chế}
-% Thẳng thắn chỉ ra những hạn chế của mô hình và ứng dụng.
 
-\textit{[Điền nội dung tại đây]}
+Mặc dù đạt được các mục tiêu đề ra, đồ án vẫn còn một số hạn chế cần được nhận thức:
 
 \textbf{Hạn chế của mô hình:}
 \begin{enumerate}
-    \item Hạn chế 1: ...
-    \item Hạn chế 2: ...
-    \item Hạn chế 3: ...
+    \item \textbf{Phụ thuộc vào giọng vùng miền:} Các mô hình được train chủ yếu trên giọng miền Nam (dữ liệu VIVOS), có thể hoạt động kém hơn với giọng miền Bắc hoặc miền Trung.
+    
+    \item \textbf{Khả năng xử lý nhiễu:} Mô hình được train trên audio sạch trong studio, chưa được kiểm nghiệm với audio có nhiễu nền hoặc chất lượng thấp.
+    
+    \item \textbf{Từ vựng hạn chế:} Vocabulary của VIVOS chủ yếu là các câu đọc sách, thiếu từ lóng, tiếng địa phương, và thuật ngữ chuyên ngành.
+    
+    \item \textbf{Độ dài audio:} Chưa tối ưu cho các đoạn audio dài (> 30 giây) do giới hạn context length của mô hình.
 \end{enumerate}
 
 \textbf{Hạn chế của ứng dụng:}
 \begin{enumerate}
-    \item Hạn chế 1: ...
-    \item Hạn chế 2: ...
+    \item \textbf{Chưa có GPU acceleration:} Ứng dụng hiện chạy trên CPU, tốc độ inference chậm hơn so với GPU.
+    
+    \item \textbf{Chưa hỗ trợ streaming:} Không thể transcribe realtime trong khi đang ghi âm, phải đợi ghi xong mới xử lý.
+    
+    \item \textbf{Chưa có authentication:} Ứng dụng demo chưa có hệ thống đăng nhập và quản lý người dùng.
+    
+    \item \textbf{Deployment local:} Chưa triển khai lên cloud server để nhiều người dùng đồng thời.
 \end{enumerate}
 
 \textbf{Hạn chế về dữ liệu:}
 \begin{itemize}
-    \item ...
+    \item VIVOS chỉ có 15 giờ audio, nhỏ hơn nhiều so với các dataset tiếng Anh (LibriSpeech: 1000+ giờ).
+    \item Thiếu đa dạng về giọng nói: chỉ có 65 speakers, chủ yếu là người trẻ.
+    \item Không có dữ liệu với nhiễu nền hoặc conversation thực tế.
 \end{itemize}
 
 \section{Hướng phát triển}
-% Đề xuất các ý tưởng để cải thiện và phát triển đồ án trong tương lai.
 
-\textit{[Điền nội dung tại đây]}
+Dựa trên các hạn chế đã nhận diện, chúng tôi đề xuất các hướng phát triển sau:
 
 \textbf{Cải thiện mô hình:}
 \begin{enumerate}
-    \item Thử nghiệm với các kiến trúc mô hình tiên tiến hơn: ...
-    \item Sử dụng thêm dữ liệu: ...
-    \item Áp dụng các kỹ thuật tối ưu hóa: ...
+    \item \textbf{Mở rộng dữ liệu huấn luyện:}
+    \begin{itemize}
+        \item Kết hợp thêm các dataset tiếng Việt: VLSP, CommonVoice Vietnamese, FPT Open Speech Dataset.
+        \item Thu thập thêm dữ liệu với giọng miền Bắc, miền Trung.
+        \item Sử dụng data augmentation: thêm nhiễu, thay đổi tốc độ, pitch shifting.
+    \end{itemize}
+    
+    \item \textbf{Thử nghiệm kiến trúc mới:}
+    \begin{itemize}
+        \item Whisper Large v3 với fine-tuning đầy đủ.
+        \item Conformer - kết hợp CNN và Transformer.
+        \item Paraformer - mô hình parallel decoding mới của Alibaba.
+    \end{itemize}
+    
+    \item \textbf{Áp dụng kỹ thuật nâng cao:}
+    \begin{itemize}
+        \item Quantization (INT8, FP16) để giảm kích thước model.
+        \item Knowledge Distillation để tạo model nhỏ hơn.
+        \item Prefix tuning hoặc Adapter thay vì LoRA.
+    \end{itemize}
 \end{enumerate}
 
 \textbf{Mở rộng ứng dụng:}
 \begin{enumerate}
-    \item Thêm tính năng mới: ...
-    \item Tối ưu hiệu năng: ...
-    \item Triển khai trên nền tảng khác: ...
+    \item \textbf{Streaming ASR:} Xử lý audio realtime bằng chunked processing, hiển thị kết quả ngay khi nói.
+    
+    \item \textbf{Speaker Diarization:} Phân biệt người nói trong cuộc hội thoại nhiều người.
+    
+    \item \textbf{Punctuation \& Capitalization:} Tự động thêm dấu câu và viết hoa.
+    
+    \item \textbf{Mobile App:} Phát triển ứng dụng iOS/Android với on-device inference.
+    
+    \item \textbf{API Service:} Cung cấp REST API để tích hợp vào các ứng dụng khác.
 \end{enumerate}
 
 \textbf{Nghiên cứu thêm:}
 \begin{itemize}
-    \item Hướng nghiên cứu 1: ...
-    \item Hướng nghiên cứu 2: ...
+    \item \textbf{Multimodal ASR:} Kết hợp audio với video (lip reading) để cải thiện độ chính xác.
+    \item \textbf{Code-switching:} Xử lý trường hợp người nói trộn tiếng Việt với tiếng Anh.
+    \item \textbf{Domain Adaptation:} Fine-tune cho các lĩnh vực cụ thể (y tế, pháp luật, kỹ thuật).
+    \item \textbf{Low-resource ASR:} Nghiên cứu các kỹ thuật học với ít dữ liệu hơn.
 \end{itemize}
+
+\section{Lời kết}
+
+Đồ án đã hoàn thành mục tiêu xây dựng hệ thống nhận dạng giọng nói tiếng Việt với độ chính xác cao (WER 11.28\%) sử dụng các mô hình học sâu tiên tiến. Kết quả cho thấy việc fine-tune các mô hình pretrained (Wav2Vec2, PhoWhisper) trên dữ liệu tiếng Việt mang lại hiệu quả vượt trội so với sử dụng trực tiếp các mô hình đa ngôn ngữ như OpenAI Whisper.
+
+Ứng dụng web demo đã được xây dựng hoàn chỉnh, cho phép người dùng trải nghiệm trực tiếp khả năng của các mô hình. Đây là nền tảng tốt để tiếp tục phát triển và mở rộng trong tương lai.
+
+Nhóm hy vọng đồ án này sẽ đóng góp vào sự phát triển của lĩnh vực xử lý ngôn ngữ tự nhiên tiếng Việt, và các kết quả nghiên cứu có thể được ứng dụng trong thực tế để hỗ trợ cộng đồng người Việt tiếp cận công nghệ AI một cách dễ dàng hơn.
