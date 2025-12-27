@@ -1,9 +1,8 @@
 \chapter{Xây dựng và Triển khai Ứng dụng}
 
 \section{Kiến trúc Hệ thống}
-% Mô tả kiến trúc tổng thể của ứng dụng, cách mô hình được đóng gói và tích hợp.
 
-\textit{[Điền nội dung tại đây]}
+Ứng dụng Vietnamese Speech-to-Text được xây dựng theo kiến trúc client-server với Flask làm backend framework. Hệ thống cho phép người dùng chuyển đổi giọng nói tiếng Việt thành văn bản thông qua 3 mô hình AI khác nhau.
 
 % Chèn sơ đồ kiến trúc hệ thống
 % \begin{figure}[H]
@@ -13,102 +12,232 @@
 %     \label{fig:system_arch}
 % \end{figure}
 
-\textbf{Các thành phần chính:}
+\subsection{Các thành phần chính}
+
 \begin{enumerate}
-    \item \textbf{Frontend:} ...
-    \item \textbf{Backend:} ...
-    \item \textbf{Model Service:} ...
-    \item \textbf{Database (nếu có):} ...
+    \item \textbf{Frontend (Client):}
+    \begin{itemize}
+        \item Giao diện web responsive sử dụng HTML5, CSS3, Bootstrap 5
+        \item JavaScript xử lý upload file, ghi âm realtime qua Web Audio API
+        \item Giao tiếp với backend thông qua REST API (Fetch API)
+    \end{itemize}
+    
+    \item \textbf{Backend (Flask Server):}
+    \begin{itemize}
+        \item Flask web framework xử lý HTTP requests
+        \item API endpoint \texttt{/transcribe} nhận audio và trả về văn bản
+        \item Quản lý loading và caching các mô hình AI
+    \end{itemize}
+    
+    \item \textbf{Model Service (AI Models):}
+    \begin{itemize}
+        \item \textbf{Wav2Vec2}: \texttt{nguyenvulebinh/wav2vec2-base-vietnamese-250h}
+        \item \textbf{PhoWhisper}: \texttt{vinai/PhoWhisper-small}
+        \item \textbf{OpenAI Whisper}: \texttt{openai/whisper-small}
+    \end{itemize}
+    
+    \item \textbf{Audio Processing:}
+    \begin{itemize}
+        \item Librosa để load và resample audio về 16kHz
+        \item Chuyển đổi định dạng (WAV, MP3, M4A, FLAC)
+    \end{itemize}
 \end{enumerate}
 
-\textbf{Cách đóng gói mô hình:} ...
+\subsection{Cách đóng gói mô hình}
 
-\textbf{Cách tích hợp mô hình với ứng dụng:} ...
+Các mô hình được tải từ Hugging Face Hub và cache locally:
+\begin{itemize}
+    \item Sử dụng thư viện \texttt{transformers} để load pretrained models
+    \item Mô hình được load lazy (chỉ khi cần) để tiết kiệm bộ nhớ
+    \item Cache trong RAM để tăng tốc độ inference cho các request tiếp theo
+\end{itemize}
+
+\subsection{Luồng xử lý dữ liệu}
+
+\begin{enumerate}
+    \item Người dùng upload file audio hoặc ghi âm trực tiếp
+    \item Frontend gửi audio data đến endpoint \texttt{/transcribe} qua POST request
+    \item Backend nhận file, lưu tạm và xử lý:
+    \begin{itemize}
+        \item Load audio với librosa (resample về 16kHz)
+        \item Trích xuất features phù hợp với mô hình được chọn
+        \item Chạy inference và decode kết quả
+    \end{itemize}
+    \item Trả về JSON response chứa văn bản transcription
+    \item Frontend hiển thị kết quả cho người dùng
+\end{enumerate}
 
 \section{Giao diện và Chức năng}
 
 \subsection{Giao diện Người dùng (UI)}
-% Mô tả giao diện người dùng (UI) và các chức năng chính.
 
-\textit{[Điền nội dung tại đây]}
+Giao diện được thiết kế modern, thân thiện với người dùng:
 
 % Chèn hình ảnh giao diện
 % \begin{figure}[H]
 %     \centering
-%     \includegraphics[width=0.8\textwidth]{img/ui_screenshot_1.png}
-%     \caption{Giao diện trang chủ}
-%     \label{fig:ui_home}
-% \end{figure}
-
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{img/ui_screenshot_2.png}
-%     \caption{Giao diện chức năng chính}
+%     \includegraphics[width=0.9\textwidth]{img/ui_main.png}
+%     \caption{Giao diện chính của ứng dụng}
 %     \label{fig:ui_main}
 % \end{figure}
 
+\textbf{Các thành phần giao diện:}
+\begin{itemize}
+    \item \textbf{Header}: Tiêu đề ứng dụng với icon và mô tả ngắn
+    \item \textbf{Model Selector}: Dropdown chọn mô hình AI (Wav2Vec2, PhoWhisper, Whisper)
+    \item \textbf{Tab Navigation}: Chuyển đổi giữa "Tải File" và "Ghi Âm"
+    \item \textbf{Upload Zone}: Khu vực drag-and-drop để upload file audio
+    \item \textbf{Record Button}: Nút ghi âm với animation và timer
+    \item \textbf{Result Box}: Hiển thị kết quả transcription với nút copy
+\end{itemize}
+
 \subsection{Các Chức năng Chính}
 
-\textit{[Điền nội dung tại đây]}
-
 \begin{enumerate}
-    \item \textbf{Chức năng 1:} Mô tả chi tiết
-    \item \textbf{Chức năng 2:} Mô tả chi tiết
-    \item \textbf{Chức năng 3:} Mô tả chi tiết
+    \item \textbf{Chọn Mô hình AI:}
+    \begin{itemize}
+        \item PhoWhisper: Tối ưu cho tiếng Việt (mặc định)
+        \item OpenAI Whisper: Mô hình đa ngôn ngữ mạnh mẽ
+        \item Wav2Vec2: Mô hình nhẹ, nhanh
+    \end{itemize}
+    
+    \item \textbf{Upload File Audio:}
+    \begin{itemize}
+        \item Hỗ trợ kéo thả (drag-and-drop)
+        \item Hỗ trợ định dạng: WAV, MP3, M4A, FLAC
+        \item Giới hạn kích thước: 50MB
+        \item Preview audio trước khi chuyển đổi
+    \end{itemize}
+    
+    \item \textbf{Ghi Âm Realtime:}
+    \begin{itemize}
+        \item Sử dụng Web Audio API và MediaRecorder
+        \item Hiển thị timer đếm thời gian ghi
+        \item Animation khi đang ghi âm
+        \item Nghe lại bản ghi trước khi chuyển đổi
+    \end{itemize}
+    
+    \item \textbf{Chuyển đổi và Hiển thị Kết quả:}
+    \begin{itemize}
+        \item Hiển thị loading spinner khi đang xử lý
+        \item Kết quả hiển thị trong box với badge mô hình
+        \item Nút sao chép kết quả vào clipboard
+    \end{itemize}
 \end{enumerate}
 
 \section{Triển khai}
-% Nêu rõ nền tảng triển khai (cloud công khai hoặc local).
-
-\textit{[Điền nội dung tại đây]}
 
 \subsection{Nền tảng Triển khai}
 
-\textbf{Loại triển khai:} Cloud công khai / Local
+\textbf{Loại triển khai:} Local (do yêu cầu GPU và dung lượng mô hình lớn)
 
-% ===== NẾU TRIỂN KHAI TRÊN CLOUD =====
-\subsection{Triển khai trên Cloud (nếu áp dụng)}
-% Nếu triển khai trên nền tảng cloud công khai: Cung cấp đường dẫn URL của ứng dụng đang hoạt động.
+\subsection{Yêu cầu Hệ thống}
 
-\textbf{Nền tảng cloud sử dụng:} (Ví dụ: Heroku, AWS, Google Cloud, Azure, ...)
+\begin{table}[H]
+\centering
+\caption{Yêu cầu hệ thống}
+\label{tab:system_requirements}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Thành phần} & \textbf{Yêu cầu} \\
+\hline
+Python & 3.8 trở lên \\
+\hline
+RAM & Tối thiểu 8GB (khuyến nghị 16GB) \\
+\hline
+GPU & NVIDIA GPU với CUDA (khuyến nghị, không bắt buộc) \\
+\hline
+Dung lượng & ~5GB cho các mô hình \\
+\hline
+Hệ điều hành & Windows, Linux, macOS \\
+\hline
+\end{tabular}
+\end{table}
 
-\textbf{URL ứng dụng:} \url{https://your-app-url.com}
+\subsection{Cấu trúc Thư mục}
 
-% ===== NẾU TRIỂN KHAI LOCAL =====
-\subsection{Triển khai Local (nếu áp dụng)}
-% Nếu triển khai local: Cung cấp hướng dẫn chi tiết (các bước cài đặt, câu lệnh chạy) để có thể chạy ứng dụng trên máy local.
+\begin{lstlisting}[style=mystyle]
+app/
+    app.py              # Flask backend
+    requirements.txt    # Dependencies  
+    README.md          # Huong dan
+    templates/
+        index.html     # Giao dien web
+\end{lstlisting}
 
-\textbf{Yêu cầu hệ thống:}
-\begin{itemize}
-    \item Python: phiên bản X.X
-    \item RAM: tối thiểu X GB
-    \item GPU: (nếu cần)
-    \item Các dependencies khác: ...
-\end{itemize}
-
-\textbf{Hướng dẫn cài đặt và chạy:}
+\subsection{Hướng dẫn Cài đặt và Chạy}
 
 \begin{enumerate}
     \item \textbf{Clone repository:}
     \begin{lstlisting}[style=mystyle]
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/DuyHieu251005/NMHM_SpeechToText.git
+cd NMHM_SpeechToText/app
     \end{lstlisting}
     
-    \item \textbf{Tạo môi trường ảo và cài đặt dependencies:}
+    \item \textbf{Tạo môi trường ảo:}
     \begin{lstlisting}[style=mystyle]
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# hoặc venv\Scripts\activate  # Windows
+
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
+source venv/bin/activate
+    \end{lstlisting}
+    
+    \item \textbf{Cài đặt dependencies:}
+    \begin{lstlisting}[style=mystyle]
 pip install -r requirements.txt
     \end{lstlisting}
     
     \item \textbf{Chạy ứng dụng:}
     \begin{lstlisting}[style=mystyle]
 python app.py
-# hoặc
-streamlit run app.py
     \end{lstlisting}
     
-    \item \textbf{Truy cập ứng dụng:} Mở trình duyệt và truy cập \url{http://localhost:8000}
+    \item \textbf{Truy cập ứng dụng:}
+    
+    Mở trình duyệt và truy cập: \url{http://localhost:5000}
 \end{enumerate}
+
+\subsection{API Endpoints}
+
+\begin{table}[H]
+\centering
+\caption{Danh sách API Endpoints}
+\label{tab:api_endpoints}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Mô tả} \\
+\hline
+GET & / & Trang chủ (giao diện web) \\
+\hline
+POST & /transcribe & Chuyển đổi audio thành văn bản \\
+\hline
+GET & /health & Kiểm tra trạng thái server \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Thư viện và Dependencies}
+
+\begin{table}[H]
+\centering
+\caption{Các thư viện chính sử dụng}
+\label{tab:dependencies}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Thư viện} & \textbf{Mục đích} \\
+\hline
+Flask & Web framework \\
+\hline
+PyTorch & Deep learning framework \\
+\hline
+Transformers & Load pretrained models từ Hugging Face \\
+\hline
+Librosa & Xử lý audio (load, resample) \\
+\hline
+PEFT & LoRA adapters cho PhoWhisper \\
+\hline
+\end{tabular}
+\end{table}
