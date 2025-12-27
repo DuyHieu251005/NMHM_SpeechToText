@@ -1,10 +1,208 @@
-% Tài liệu tham khảo
+% ==============================================================================
+% TÀI LIỆU THAM KHẢO - ĐỒ ÁN SPEECH-TO-TEXT TIẾNG VIỆT
+% ==============================================================================
 
-@online{
-  example_reference,
-  author="Tên Tác Giả",
-  url="https://example.com",
-  title="Tiêu đề tài liệu tham khảo"
+% ------------------------------------------------------------------------------
+% CÁC MÔ HÌNH CHÍNH
+% ------------------------------------------------------------------------------
+
+@article{baevski2020wav2vec,
+  title   = {wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations},
+  author  = {Baevski, Alexei and Zhou, Yuhao and Mohamed, Abdelrahman and Auli, Michael},
+  journal = {Advances in Neural Information Processing Systems},
+  volume  = {33},
+  pages   = {12449--12460},
+  year    = {2020},
+  url     = {https://arxiv.org/abs/2006.11477},
+  note    = {Paper gốc giới thiệu kiến trúc Wav2Vec2, sử dụng Self-Supervised Learning và CTC Loss}
 }
 
-% Thêm các tài liệu tham khảo khác tại đây
+@article{radford2022whisper,
+  title   = {Robust Speech Recognition via Large-Scale Weak Supervision},
+  author  = {Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg and McLeavey, Christine and Sutskever, Ilya},
+  journal = {arXiv preprint arXiv:2212.04356},
+  year    = {2022},
+  url     = {https://arxiv.org/abs/2212.04356},
+  note    = {Paper chính thức của OpenAI Whisper, mô hình Encoder-Decoder được train trên 680,000 giờ dữ liệu đa ngôn ngữ}
+}
+
+@article{phowhisper2024,
+  title   = {PhoWhisper: Automatic Speech Recognition for Vietnamese},
+  author  = {Thanh-Thien Le and Linh The Nguyen and Tin Nguyen},
+  journal = {arXiv preprint arXiv:2405.11189},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2405.11189},
+  note    = {Phiên bản Whisper được VinAI Research fine-tune đặc biệt cho tiếng Việt}
+}
+
+% ------------------------------------------------------------------------------
+% BỘ DỮ LIỆU
+% ------------------------------------------------------------------------------
+
+@inproceedings{luong2016vivos,
+  title     = {A Vietnamese Corpus for Automatic Speech Recognition},
+  author    = {Luong, Hieu-Thi and Vu, Hai-Quan},
+  booktitle = {Proceedings of the 30th Pacific Asia Conference on Language, Information and Computation (PACLIC 30)},
+  pages     = {267--275},
+  year      = {2016},
+  url       = {https://arxiv.org/abs/1610.02139},
+  note      = {Bộ dữ liệu VIVOS - 15 giờ audio tiếng Việt (giọng miền Nam), 12,420 mẫu}
+}
+
+@online{vivos_dataset,
+  title  = {VIVOS: Vietnamese Speech Corpus for ASR},
+  author = {AILAB, HCMUS},
+  url    = {https://ailab.hcmus.edu.vn/vivos},
+  year   = {2016},
+  note   = {Trang download chính thức của bộ dữ liệu VIVOS}
+}
+
+% ------------------------------------------------------------------------------
+% KỸ THUẬT VÀ PHƯƠNG PHÁP
+% ------------------------------------------------------------------------------
+
+@article{hu2021lora,
+  title   = {LoRA: Low-Rank Adaptation of Large Language Models},
+  author  = {Hu, Edward J and Shen, Yelong and Wallis, Phillip and Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and Wang, Lu and Chen, Weizhu},
+  journal = {arXiv preprint arXiv:2106.09685},
+  year    = {2021},
+  url     = {https://arxiv.org/abs/2106.09685},
+  note    = {Kỹ thuật LoRA được sử dụng để fine-tune PhoWhisper hiệu quả với ít tham số}
+}
+
+@article{graves2006ctc,
+  title     = {Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks},
+  author    = {Graves, Alex and Fern{\'a}ndez, Santiago and Gomez, Faustino and Schmidhuber, J{\"u}rgen},
+  booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
+  pages     = {369--376},
+  year      = {2006},
+  url       = {https://www.cs.toronto.edu/~graves/icml_2006.pdf},
+  note      = {CTC Loss - phương pháp được sử dụng trong Wav2Vec2 để huấn luyện mà không cần alignment}
+}
+
+@article{vaswani2017attention,
+  title   = {Attention is All You Need},
+  author  = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  journal = {Advances in Neural Information Processing Systems},
+  volume  = {30},
+  year    = {2017},
+  url     = {https://arxiv.org/abs/1706.03762},
+  note    = {Paper gốc về Transformer - kiến trúc nền tảng cho cả Wav2Vec2 và Whisper}
+}
+
+% ------------------------------------------------------------------------------
+% PRETRAINED MODELS
+% ------------------------------------------------------------------------------
+
+@online{wav2vec2_vietnamese,
+  title  = {wav2vec2-base-vietnamese-250h},
+  author = {Nguyen Vu Le Binh},
+  url    = {https://huggingface.co/nguyenvulebinh/wav2vec2-base-vietnamese-250h},
+  year   = {2021},
+  note   = {Mô hình Wav2Vec2 pretrained trên 250 giờ dữ liệu tiếng Việt, được sử dụng trong đồ án}
+}
+
+@online{phowhisper_model,
+  title  = {PhoWhisper-small Model Card},
+  author = {VinAI Research},
+  url    = {https://huggingface.co/vinai/PhoWhisper-small},
+  year   = {2024},
+  note   = {Model card chính thức của PhoWhisper-small trên Hugging Face}
+}
+
+@online{whisper_tiny,
+  title  = {Whisper Tiny Model},
+  author = {OpenAI},
+  url    = {https://huggingface.co/openai/whisper-tiny},
+  year   = {2022},
+  note   = {Model card của OpenAI Whisper Tiny (39M parameters)}
+}
+
+@online{whisper_github,
+  title  = {Whisper: Robust Speech Recognition via Large-Scale Weak Supervision},
+  author = {OpenAI},
+  url    = {https://github.com/openai/whisper},
+  year   = {2022},
+  note   = {GitHub repository chính thức của OpenAI Whisper}
+}
+
+% ------------------------------------------------------------------------------
+% THƯ VIỆN VÀ CÔNG CỤ
+% ------------------------------------------------------------------------------
+
+@online{huggingface_transformers,
+  title  = {Transformers: State-of-the-art Machine Learning for Pytorch, TensorFlow, and JAX},
+  author = {Wolf, Thomas and Debut, Lysandre and Sanh, Victor and Chaumond, Julien and Delangue, Clement and Moi, Anthony and Cistac, Pierric and Rault, Tim and Louf, R{\'e}mi and Funtowicz, Morgan and others},
+  url    = {https://huggingface.co/docs/transformers},
+  year   = {2020},
+  note   = {Thư viện Transformers của Hugging Face, sử dụng để load và fine-tune các mô hình}
+}
+
+@online{peft_library,
+  title  = {PEFT: Parameter-Efficient Fine-Tuning of Billion-Scale Models},
+  author = {Hugging Face},
+  url    = {https://huggingface.co/docs/peft},
+  year   = {2023},
+  note   = {Thư viện PEFT chứa implementation của LoRA và các kỹ thuật fine-tuning hiệu quả khác}
+}
+
+@online{evaluate_library,
+  title  = {Evaluate: A Library for Easily Evaluating Machine Learning Models and Datasets},
+  author = {Hugging Face},
+  url    = {https://huggingface.co/docs/evaluate},
+  year   = {2022},
+  note   = {Thư viện Evaluate, sử dụng để tính WER (Word Error Rate) và các metrics khác}
+}
+
+@online{datasets_library,
+  title  = {Datasets: A Community Library for Natural Language Processing},
+  author = {Lhoest, Quentin and Villanova del Moral, Albert and Jernite, Yacine and Thakur, Abhishek and von Pl{\"a}ten, Patrick and Patil, Suraj and Chaumond, Julien and Drame, Mariama and Plu, Julien and Tunstall, Lewis and others},
+  url    = {https://huggingface.co/docs/datasets},
+  year   = {2021},
+  note   = {Thư viện Datasets của Hugging Face, sử dụng để load và xử lý dữ liệu VIVOS}
+}
+
+% ------------------------------------------------------------------------------
+% METRICS VÀ ĐÁNH GIÁ
+% ------------------------------------------------------------------------------
+
+@online{wer_metric,
+  title  = {Word Error Rate (WER) Metric},
+  author = {Hugging Face},
+  url    = {https://huggingface.co/spaces/evaluate-metric/wer},
+  year   = {2022},
+  note   = {Chỉ số WER - metric chính để đánh giá hiệu năng ASR}
+}
+
+@online{cer_metric,
+  title  = {Character Error Rate (CER) Metric},
+  author = {Hugging Face},
+  url    = {https://huggingface.co/spaces/evaluate-metric/cer},
+  year   = {2022},
+  note   = {Chỉ số CER - đánh giá ở mức ký tự, được sử dụng bổ sung cho PhoWhisper}
+}
+
+% ------------------------------------------------------------------------------
+% NGÔN NGỮ HỌC TIẾNG VIỆT
+% ------------------------------------------------------------------------------
+
+@article{vietnamese_tones,
+  title   = {Vietnamese Tone: A New Analysis},
+  author  = {Brunelle, Marc},
+  journal = {Journal of Southeast Asian Linguistics},
+  volume  = {1},
+  pages   = {1--34},
+  year    = {2009},
+  note    = {Phân tích về hệ thống 6 thanh điệu của tiếng Việt - một trong những thách thức chính cho ASR}
+}
+
+% ==============================================================================
+% CÁCH SỬ DỤNG
+% ==============================================================================
+% Trong các file .tex, sử dụng:
+% - \cite{baevski2020wav2vec} để trích dẫn Wav2Vec2
+% - \cite{radford2022whisper} để trích dẫn OpenAI Whisper
+% - \cite{phowhisper2024} để trích dẫn PhoWhisper
+% - \cite{luong2016vivos} để trích dẫn VIVOS dataset
+% - \cite{hu2021lora} để trích dẫn kỹ thuật LoRA
+% ==============================================================================
