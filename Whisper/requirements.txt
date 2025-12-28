@@ -1,0 +1,43 @@
+# Requirements cho training Whisper
+# Đồ án Nhập môn Học máy - HCMUS
+
+# PyTorch (chọn version phù hợp với CUDA)
+# CPU only:
+# pip install torch torchaudio
+# CUDA 11.8:
+# pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
+# CUDA 12.1:
+# pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Transformers
+transformers>=4.36.0
+
+# Dataset handling
+datasets>=2.14.0
+
+# Audio processing  
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# Metrics
+evaluate>=0.4.0
+jiwer>=3.0.0  # Cho WER calculation
+
+# Utilities
+numpy>=1.24.0
+tqdm>=4.65.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Accelerate (tăng tốc training)
+accelerate>=0.24.0
+
+# TensorBoard (logging)
+tensorboard>=2.14.0
+
+# Optional: Mixed precision training
+# Nếu dùng bfloat16 thay vì fp16
+# bitsandbytes>=0.41.0  # Chỉ hỗ trợ Linux
