@@ -31,15 +31,18 @@
     
     \item \textbf{Model Service (AI Models):}
     \begin{itemize}
-        \item \textbf{Wav2Vec2}: \texttt{nguyenvulebinh/wav2vec2-base-vietnamese-250h}
-        \item \textbf{PhoWhisper}: \texttt{vinai/PhoWhisper-small}
+        \item \textbf{Wav2Vec2}: \texttt{nguyenvulebinh/wav2vec2-base-vietnamese-250h} (checkpoint fine-tuned)
+        \item \textbf{PhoWhisper Fine-tuned}: \texttt{vinai/PhoWhisper-small} + LoRA adapter
+        \item \textbf{PhoWhisper Base}: \texttt{vinai/PhoWhisper-small} (pre-trained)
         \item \textbf{OpenAI Whisper}: \texttt{openai/whisper-small}
     \end{itemize}
     
     \item \textbf{Audio Processing:}
     \begin{itemize}
-        \item Librosa để load và resample audio về 16kHz
-        \item Chuyển đổi định dạng (WAV, MP3, M4A, FLAC)
+        \item FFmpeg (imageio-ffmpeg) để chuyển đổi và resample audio về 16kHz mono
+        \item SoundFile để đọc audio đã chuyển đổi
+        \item Hỗ trợ định dạng: WAV, MP3, M4A, FLAC, WebM
+        \item Kiểm tra silence (RMS energy) trước khi transcribe
     \end{itemize}
 \end{enumerate}
 
@@ -59,7 +62,8 @@ Các mô hình được tải từ Hugging Face Hub và cache locally:
     \item Frontend gửi audio data đến endpoint \texttt{/transcribe} qua POST request
     \item Backend nhận file, lưu tạm và xử lý:
     \begin{itemize}
-        \item Load audio với librosa (resample về 16kHz)
+        \item Chuyển đổi audio sang WAV 16kHz mono bằng FFmpeg
+        \item Kiểm tra silence (nếu silent thì bỏ qua transcription)
         \item Trích xuất features phù hợp với mô hình được chọn
         \item Chạy inference và decode kết quả
     \end{itemize}
@@ -84,7 +88,7 @@ Giao diện được thiết kế modern, thân thiện với người dùng:
 \textbf{Các thành phần giao diện:}
 \begin{itemize}
     \item \textbf{Header}: Tiêu đề ứng dụng với icon và mô tả ngắn
-    \item \textbf{Model Selector}: Dropdown chọn mô hình AI (Wav2Vec2, PhoWhisper, Whisper)
+    \item \textbf{Model Selector}: Dropdown chọn mô hình AI (Wav2Vec2, PhoWhisper Fine-tuned, PhoWhisper Base, Whisper)
     \item \textbf{Tab Navigation}: Chuyển đổi giữa "Tải File" và "Ghi Âm"
     \item \textbf{Upload Zone}: Khu vực drag-and-drop để upload file audio
     \item \textbf{Record Button}: Nút ghi âm với animation và timer
@@ -96,9 +100,10 @@ Giao diện được thiết kế modern, thân thiện với người dùng:
 \begin{enumerate}
     \item \textbf{Chọn Mô hình AI:}
     \begin{itemize}
-        \item PhoWhisper: Tối ưu cho tiếng Việt (mặc định)
+        \item PhoWhisper Fine-tuned: Mô hình đã fine-tune với LoRA (mặc định)
+        \item PhoWhisper Base: Mô hình pre-trained gốc từ VinAI
         \item OpenAI Whisper: Mô hình đa ngôn ngữ mạnh mẽ
-        \item Wav2Vec2: Mô hình nhẹ, nhanh
+        \item Wav2Vec2: Mô hình CTC fine-tuned cho tiếng Việt
     \end{itemize}
     
     \item \textbf{Upload File Audio:}
@@ -235,7 +240,9 @@ PyTorch & Deep learning framework \\
 \hline
 Transformers & Load pretrained models từ Hugging Face \\
 \hline
-Librosa & Xử lý audio (load, resample) \\
+imageio-ffmpeg & Chuyển đổi và resample audio \\
+\hline
+SoundFile & Đọc file audio WAV \\
 \hline
 PEFT & LoRA adapters cho PhoWhisper \\
 \hline
