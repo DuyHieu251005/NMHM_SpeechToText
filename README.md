@@ -7,11 +7,11 @@
 
 ## Tính năng
 
-✅ Upload file audio (WAV, MP3, M4A, FLAC)  
-✅ Ghi âm trực tiếp từ microphone  
-✅ Chọn giữa 3 mô hình AI  
-✅ Giao diện đẹp, thân thiện  
-✅ Hỗ trợ drag & drop  
+Upload file audio (WAV, MP3, M4A, FLAC)  
+Ghi âm trực tiếp từ microphone  
+Chọn giữa 3 mô hình AI  
+Giao diện đẹp, thân thiện  
+Hỗ trợ drag & drop  
 
 ## Cài đặt
 
