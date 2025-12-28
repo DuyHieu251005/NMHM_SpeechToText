@@ -1,539 +1,677 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vietnamese Speech-to-Text</title>
+    <title>AI Audio Transcription</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --secondary-color: #7c3aed;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
-        
+
         body {
-            background: var(--bg-gradient);
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .main-container {
-            padding: 40px 20px;
-        }
-        
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-        }
-        
-        .card-header {
-            background: var(--bg-gradient);
-            border-radius: 20px 20px 0 0 !important;
-            padding: 25px;
-        }
-        
-        .card-header h1 {
             color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Shapes */
+        .shape {
+            position: absolute;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .shape-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            top: 40%;
+            left: 40%;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, -50px);
+            }
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .app-title {
             font-weight: 700;
-            margin: 0;
+            background: linear-gradient(to right, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
         }
-        
-        .card-header p {
-            color: rgba(255, 255, 255, 0.8);
-            margin: 10px 0 0 0;
-        }
-        
-        .nav-tabs {
-            border: none;
-            background: #f8f9fa;
-            border-radius: 15px;
+
+        /* Tabs */
+        .nav-pills {
+            background: rgba(0, 0, 0, 0.2);
             padding: 5px;
-            margin-bottom: 25px;
+            border-radius: 15px;
+            display: inline-flex;
+            margin-bottom: 30px;
         }
-        
-        .nav-tabs .nav-link {
-            border: none;
+
+        .nav-pills .nav-link {
+            color: rgba(255, 255, 255, 0.7);
             border-radius: 12px;
-            padding: 12px 25px;
-            font-weight: 600;
-            color: #6b7280;
-            transition: all 0.3s ease;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s;
         }
-        
-        .nav-tabs .nav-link.active {
-            background: var(--bg-gradient);
+
+        .nav-pills .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Form Elements */
+        .custom-select {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .custom-select:focus {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+            box-shadow: none;
             color: white;
         }
-        
-        .nav-tabs .nav-link:hover:not(.active) {
-            background: #e5e7eb;
+
+        .custom-select option {
+            background: #1e1b4b;
+            color: white;
         }
-        
-        .model-select {
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 12px 20px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .model-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        .upload-zone {
-            border: 3px dashed #d1d5db;
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 50px;
+            padding: 60px 20px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             cursor: pointer;
-            background: #fafafa;
+            background: rgba(255, 255, 255, 0.02);
         }
-        
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--primary-color);
-            background: rgba(79, 70, 229, 0.05);
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.01);
         }
-        
-        .upload-zone i {
-            font-size: 60px;
-            color: #9ca3af;
+
+        .upload-icon {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.5);
             margin-bottom: 20px;
         }
-        
-        .btn-primary {
-            background: var(--bg-gradient);
-            border: none;
-            border-radius: 12px;
-            padding: 14px 35px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
-        }
-        
-        .btn-record {
-            width: 120px;
-            height: 120px;
+
+        /* Record Button */
+        .record-btn {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            font-size: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 30px auto;
-            transition: all 0.3s ease;
+            margin: 0 auto;
+            transition: all 0.3s;
+            box-shadow: 0 0 0 rgba(236, 72, 153, 0);
         }
-        
-        .btn-record.recording {
-            background: #ef4444 !important;
-            animation: pulse 1.5s infinite;
+
+        .record-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
         }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+        .record-btn.recording {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            animation: pulse-ring 2s infinite;
         }
-        
-        .result-box {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border: 2px solid #86efac;
-            border-radius: 15px;
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(236, 72, 153, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(236, 72, 153, 0);
+            }
+        }
+
+        /* Action Button */
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Area */
+        .result-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
             padding: 25px;
-            margin-top: 25px;
-        }
-        
-        .result-box h5 {
-            color: #166534;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-        
-        .result-text {
-            font-size: 18px;
-            line-height: 1.8;
-            color: #1f2937;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            min-height: 100px;
-        }
-        
-        .loading-spinner {
+            margin-top: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             display: none;
         }
-        
-        .loading-spinner.show {
-            display: block;
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .model-badge {
-            display: inline-block;
+
+        .result-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
             padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        
-        .model-badge.wav2vec2 { background: #dbeafe; color: #1d4ed8; }
-        .model-badge.phowhisper { background: #fce7f3; color: #be185d; }
-        .model-badge.whisper { background: #f3e8ff; color: #7c3aed; }
-        
-        .timer {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 15px 0;
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
-        
-        .audio-preview {
-            margin-top: 20px;
+
+        /* Loading */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 15px;
         }
-        
-        .file-info {
-            background: #f3f4f6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 10;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Audio Player Styling */
+        audio::-webkit-media-controls-panel {
+            background-color: rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
+
 <body>
-    <div class="container main-container">
+
+    <!-- Background Elements -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+
+    <div class="container pb-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header text-center">
-                        <h1><i class="fas fa-microphone-alt me-3"></i>Vietnamese Speech-to-Text</h1>
-                        <p>Chuyển đổi giọng nói tiếng Việt thành văn bản với AI</p>
+                <div class="glass-card position-relative">
+
+                    <!-- Loading State -->
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <span class="loader"></span>
+                        <h4 class="mt-3">Processing Audio...</h4>
+                        <p class="text-white-50">Please wait while the AI works its magic</p>
                     </div>
-                    
-                    <div class="card-body p-4">
-                        <!-- Model Selection -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-robot me-2"></i>Chọn Mô hình AI
-                            </label>
-                            <select id="modelSelect" class="form-select model-select">
-                                <option value="phowhisper">🇻🇳 PhoWhisper (Tối ưu cho Tiếng Việt)</option>
-                                <option value="whisper">🌍 OpenAI Whisper (Đa ngôn ngữ)</option>
-                                <option value="wav2vec2">⚡ Wav2Vec2 (Nhanh, nhẹ)</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Tabs -->
-                        <ul class="nav nav-tabs" id="inputTabs" role="tablist">
+
+                    <div class="text-center mb-5">
+                        <h1 class="app-title">AI Speech to Text</h1>
+                        <p class="text-white-50">Transcribe Vietnamese speech with advanced AI models</p>
+                    </div>
+
+                    <div class="text-center">
+                        <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button">
-                                    <i class="fas fa-file-audio me-2"></i>Tải File
+                                <button class="nav-link active" id="pills-upload-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-upload" type="button">
+                                    <i class="fas fa-cloud-upload-alt me-2"></i>Upload File
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="record-tab" data-bs-toggle="tab" data-bs-target="#record" type="button">
-                                    <i class="fas fa-microphone me-2"></i>Ghi Âm
+                                <button class="nav-link" id="pills-record-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-record" type="button">
+                                    <i class="fas fa-microphone me-2"></i>Record
                                 </button>
                             </li>
                         </ul>
-                        
-                        <div class="tab-content" id="inputTabsContent">
-                            <!-- Upload Tab -->
-                            <div class="tab-pane fade show active" id="upload" role="tabpanel">
-                                <div class="upload-zone" id="dropZone" onclick="document.getElementById('audioFile').click()">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <h4>Kéo thả file audio vào đây</h4>
-                                    <p class="text-muted">hoặc click để chọn file</p>
-                                    <p class="text-muted small">Hỗ trợ: WAV, MP3, M4A, FLAC (tối đa 50MB)</p>
-                                </div>
-                                <input type="file" id="audioFile" accept="audio/*" hidden>
-                                
-                                <div class="file-info" id="fileInfo" style="display: none;">
-                                    <i class="fas fa-file-audio me-2 text-primary"></i>
-                                    <span id="fileName"></span>
-                                    <button class="btn btn-sm btn-outline-danger float-end" onclick="clearFile()">
+                    </div>
+
+                    <!-- Model Selector -->
+                    <div class="mb-4">
+                        <label class="form-label text-white-50 ms-1">Select AI Model</label>
+                        <select class="form-select custom-select" id="modelSelect">
+                            <option value="phowhisper_finetuned" selected>🇻🇳 PhoWhisper (Your Local Fine-tuned Model)
+                            </option>
+                            <option value="phowhisper_base">🥈 PhoWhisper (Pre-trained Base Model)</option>
+                            <option value="whisper">🌍 OpenAI Whisper (Multilingual)</option>
+                            <option value="wav2vec2">⚡ Wav2Vec2 (Your Local Checkpoint)</option>
+                        </select>
+                        <div class="form-text text-white-50 ms-1 mt-2">
+                            <small><i class="fas fa-info-circle me-1"></i> Choose 'Fine-tuned' for your dataset, or
+                                'Base' for general purpose.</small>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="pills-tabContent">
+
+                        <!-- Upload Tab -->
+                        <div class="tab-pane fade show active" id="pills-upload" role="tabpanel">
+                            <div class="upload-area" id="dropZone">
+                                <i class="fas fa-music upload-icon"></i>
+                                <h5>Drop audio file here</h5>
+                                <p class="text-white-50 mb-0">or click to browse</p>
+                                <input type="file" id="fileInput" hidden accept="audio/*">
+                            </div>
+
+                            <div id="filePreview" class="mt-4" style="display: none;">
+                                <div
+                                    class="d-flex align-items-center justify-content-between bg-white bg-opacity-10 p-3 rounded-3 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle p-2 me-3">
+                                            <i class="fas fa-file-audio text-white"></i>
+                                        </div>
+                                        <div class="text-truncate" style="max-width: 250px;">
+                                            <h6 class="mb-0 text-white" id="fileName">filename.mp3</h6>
+                                            <small class="text-white-50" id="fileSize">2.4 MB</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger border-0" onclick="clearFile()">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
-                                
-                                <div class="audio-preview" id="audioPreview" style="display: none;">
-                                    <audio id="audioPlayer" controls class="w-100"></audio>
-                                </div>
-                                
-                                <div class="text-center mt-4">
-                                    <button class="btn btn-primary btn-lg" id="transcribeBtn" onclick="transcribeFile()">
-                                        <i class="fas fa-magic me-2"></i>Chuyển đổi thành văn bản
+                                <audio id="audioPreview" controls class="w-100"></audio>
+                                <div class="text-center">
+                                    <button class="action-btn" onclick="transcribeFile()">
+                                        <i class="fas fa-magic me-2"></i>Transcribe Now
                                     </button>
                                 </div>
                             </div>
-                            
-                            <!-- Record Tab -->
-                            <div class="tab-pane fade" id="record" role="tabpanel">
-                                <div class="text-center">
-                                    <button class="btn btn-primary btn-record" id="recordBtn" onclick="toggleRecording()">
+                        </div>
+
+                        <!-- Record Tab -->
+                        <div class="tab-pane fade" id="pills-record" role="tabpanel">
+                            <div class="text-center py-4">
+                                <div class="mb-4">
+                                    <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
                                         <i class="fas fa-microphone"></i>
                                     </button>
-                                    <p id="recordStatus" class="mt-3 fw-bold">Nhấn để bắt đầu ghi âm</p>
-                                    <div class="timer" id="recordTimer" style="display: none;">00:00</div>
-                                    
-                                    <div class="audio-preview" id="recordedAudioPreview" style="display: none;">
-                                        <audio id="recordedAudioPlayer" controls class="w-100"></audio>
-                                    </div>
-                                    
-                                    <button class="btn btn-primary btn-lg mt-3" id="transcribeRecordBtn" onclick="transcribeRecording()" style="display: none;">
-                                        <i class="fas fa-magic me-2"></i>Chuyển đổi thành văn bản
+                                </div>
+                                <h4 id="recordStatus" class="mb-2">Click to Record</h4>
+                                <div id="timer" class="display-6 font-monospace mb-4 op-0"
+                                    style="opacity: 0; transition: opacity 0.3s">00:00</div>
+
+                                <div id="recordingPreview" style="display: none;" class="mt-4">
+                                    <audio id="recordedAudio" controls class="w-100 mb-3"></audio>
+                                    <button class="action-btn" onclick="transcribeRecording()">
+                                        <i class="fas fa-magic me-2"></i>Transcribe Recording
+                                    </button>
+                                    <button class="btn btn-outline-light rounded-pill px-4 mt-3 d-block mx-auto"
+                                        onclick="resetRecording()">
+                                        Record Again
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Loading -->
-                        <div class="text-center loading-spinner" id="loadingSpinner">
-                            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                                <span class="visually-hidden">Loading...</span>
+
+                    </div>
+
+                    <!-- Result Section -->
+                    <div class="result-container" id="resultContainer">
+                        <div class="result-header">
+                            <div>
+                                <h5 class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>Transcription
+                                    Result</h5>
+                                <small class="text-white-50" id="resultModel">Model used: PhoWhisper</small>
                             </div>
-                            <p class="mt-3 fw-bold text-primary">Đang xử lý... Vui lòng đợi</p>
-                        </div>
-                        
-                        <!-- Result -->
-                        <div class="result-box" id="resultBox" style="display: none;">
-                            <h5><i class="fas fa-check-circle me-2"></i>Kết quả chuyển đổi</h5>
-                            <div class="result-text" id="resultText"></div>
-                            <span class="model-badge" id="modelBadge"></span>
-                            <button class="btn btn-sm btn-outline-primary float-end" onclick="copyResult()">
-                                <i class="fas fa-copy me-1"></i>Sao chép
+                            <button class="copy-btn" onclick="copyResult()">
+                                <i class="far fa-copy me-1"></i>Copy
                             </button>
                         </div>
+                        <div class="result-content" id="resultText"></div>
                     </div>
-                    
-                    <div class="card-footer text-center text-muted py-3">
-                        <small>
-                            <i class="fas fa-info-circle me-1"></i>
-                            Powered by Wav2Vec2, PhoWhisper & OpenAI Whisper
-                        </small>
-                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Variables
-        let mediaRecorder;
+        // State
+        let selectedFile = null;
+        let mediaRecorder = null;
         let audioChunks = [];
-        let recordedBlob;
+        let recordedBlob = null;
         let isRecording = false;
         let timerInterval;
-        let seconds = 0;
-        let selectedFile = null;
-        
-        // Drag and drop
+        let startTime;
+
+        // Elements
         const dropZone = document.getElementById('dropZone');
-        
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const audioPreview = document.getElementById('audioPreview');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultText = document.getElementById('resultText');
+        const resultModel = document.getElementById('resultModel');
+        const recordBtn = document.getElementById('recordBtn');
+        const recordStatus = document.getElementById('recordStatus');
+        const timer = document.getElementById('timer');
+        const recordingPreview = document.getElementById('recordingPreview');
+        const recordedAudio = document.getElementById('recordedAudio');
+
+        // File Upload Handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('dragover');
         });
-        
+
         dropZone.addEventListener('dragleave', () => {
             dropZone.classList.remove('dragover');
         });
-        
+
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
         });
-        
-        // File input
-        document.getElementById('audioFile').addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
         });
-        
+
         function handleFile(file) {
-            if (!file.type.startsWith('audio/')) {
-                alert('Vui lòng chọn file audio!');
-                return;
-            }
-            
+            if (!file.type.startsWith('audio/')) return alert('Please upload an audio file');
             selectedFile = file;
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileInfo').style.display = 'block';
-            
-            // Preview audio
-            const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.src = URL.createObjectURL(file);
-            document.getElementById('audioPreview').style.display = 'block';
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+            audioPreview.src = URL.createObjectURL(file);
+            dropZone.style.display = 'none';
+            filePreview.style.display = 'block';
+            hideResult();
         }
-        
+
         function clearFile() {
             selectedFile = null;
-            document.getElementById('fileInfo').style.display = 'none';
-            document.getElementById('audioPreview').style.display = 'none';
-            document.getElementById('audioFile').value = '';
+            fileInput.value = '';
+            dropZone.style.display = 'block';
+            filePreview.style.display = 'none';
+            hideResult();
         }
-        
-        // Recording
+
+        // Recording Logic
         async function toggleRecording() {
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    
-                    // Try to use best supported format
-                    let mimeType = 'audio/webm';
-                    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                        mimeType = 'audio/webm;codecs=opus';
-                    } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
-                        mimeType = 'audio/ogg;codecs=opus';
-                    } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                        mimeType = 'audio/mp4';
-                    }
-                    
-                    mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
-                    audioChunks = [];
-                    
-                    mediaRecorder.ondataavailable = (e) => {
-                        if (e.data.size > 0) {
-                            audioChunks.push(e.data);
-                        }
-                    };
-                    
-                    mediaRecorder.onstop = () => {
-                        // Get the actual mime type used
-                        const mimeType = mediaRecorder.mimeType || 'audio/webm';
-                        const extension = mimeType.includes('ogg') ? '.ogg' : 
-                                         mimeType.includes('mp4') ? '.mp4' : '.webm';
-                        recordedBlob = new Blob(audioChunks, { type: mimeType });
-                        const audioUrl = URL.createObjectURL(recordedBlob);
-                        document.getElementById('recordedAudioPlayer').src = audioUrl;
-                        document.getElementById('recordedAudioPreview').style.display = 'block';
-                        document.getElementById('transcribeRecordBtn').style.display = 'inline-block';
-                        
-                        // Store extension for later use
-                        recordedBlob.extension = extension;
-                    };
-                    
-                    mediaRecorder.start();
-                    isRecording = true;
-                    
-                    document.getElementById('recordBtn').classList.add('recording');
-                    document.getElementById('recordBtn').innerHTML = '<i class="fas fa-stop"></i>';
-                    document.getElementById('recordStatus').textContent = 'Đang ghi âm...';
-                    document.getElementById('recordTimer').style.display = 'block';
-                    
-                    // Start timer
-                    seconds = 0;
-                    timerInterval = setInterval(updateTimer, 1000);
-                    
+                    startRecording(stream);
                 } catch (err) {
-                    alert('Không thể truy cập microphone. Vui lòng cấp quyền truy cập!');
+                    alert('Microphone access denied');
                 }
             } else {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-                isRecording = false;
-                
-                document.getElementById('recordBtn').classList.remove('recording');
-                document.getElementById('recordBtn').innerHTML = '<i class="fas fa-microphone"></i>';
-                document.getElementById('recordStatus').textContent = 'Ghi âm hoàn tất!';
-                
-                clearInterval(timerInterval);
+                stopRecording();
             }
         }
-        
-        function updateTimer() {
-            seconds++;
-            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const secs = (seconds % 60).toString().padStart(2, '0');
-            document.getElementById('recordTimer').textContent = `${mins}:${secs}`;
+
+        function startRecording(stream) {
+            audioChunks = [];
+
+            // Prefer opus codec for better quality/size
+            let options = { mimeType: 'audio/webm' };
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                options = { mimeType: 'audio/webm;codecs=opus' };
+            }
+
+            mediaRecorder = new MediaRecorder(stream, options);
+
+            mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                recordedBlob = blob;
+                recordedAudio.src = URL.createObjectURL(blob);
+                recordingPreview.style.display = 'block';
+                recordBtn.style.display = 'none';
+                recordStatus.style.display = 'none';
+                timer.style.display = 'none';
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            recordBtn.classList.add('recording');
+            recordBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            recordStatus.textContent = 'Recording...';
+            timer.style.opacity = '1';
+
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                const delta = Date.now() - startTime;
+                const secs = Math.floor((delta / 1000) % 60).toString().padStart(2, '0');
+                const mins = Math.floor((delta / 1000 / 60)).toString().padStart(2, '0');
+                timer.textContent = `${mins}:${secs}`;
+            }, 1000);
+
+            hideResult();
         }
-        
-        // Transcribe file
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            isRecording = false;
+            clearInterval(timerInterval);
+            recordBtn.classList.remove('recording');
+            recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        }
+
+        function resetRecording() {
+            recordedBlob = null;
+            recordingPreview.style.display = 'none';
+            recordBtn.style.display = 'flex';
+            recordStatus.style.display = 'block';
+            recordStatus.textContent = 'Click to Record';
+            timer.textContent = '00:00';
+            timer.style.opacity = '0';
+            hideResult();
+        }
+
+        // Transcription
         async function transcribeFile() {
-            if (!selectedFile) {
-                alert('Vui lòng chọn file audio!');
-                return;
-            }
-            
-            await transcribe(selectedFile);
+            if (!selectedFile) return;
+            await sendRequest(selectedFile, selectedFile.name);
         }
-        
-        // Transcribe recording
+
         async function transcribeRecording() {
-            if (!recordedBlob) {
-                alert('Vui lòng ghi âm trước!');
-                return;
-            }
-            
-            await transcribe(recordedBlob);
+            if (!recordedBlob) return;
+            const ext = recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
+            await sendRequest(recordedBlob, `recording.${ext}`);
         }
-        
-        // Main transcribe function
-        async function transcribe(audioData) {
-            const model = document.getElementById('modelSelect').value;
+
+        async function sendRequest(audioBlob, filename) {
+            loadingOverlay.classList.add('active');
             const formData = new FormData();
-            
-            // Determine filename with correct extension
-            let filename = 'audio.wav';
-            if (audioData.extension) {
-                filename = 'recording' + audioData.extension;
-            } else if (audioData.name) {
-                filename = audioData.name;
-            }
-            
-            formData.append('audio', audioData, filename);
-            formData.append('model', model);
-            
-            // Show loading
-            document.getElementById('loadingSpinner').classList.add('show');
-            document.getElementById('resultBox').style.display = 'none';
-            
+            formData.append('audio', audioBlob, filename);
+            formData.append('model', document.getElementById('modelSelect').value);
+
             try {
-                const response = await fetch('/transcribe', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    document.getElementById('resultText').textContent = result.transcription;
-                    const badge = document.getElementById('modelBadge');
-                    badge.textContent = model === 'wav2vec2' ? 'Wav2Vec2' : 
-                                       model === 'phowhisper' ? 'PhoWhisper' : 'OpenAI Whisper';
-                    badge.className = 'model-badge ' + model;
-                    document.getElementById('resultBox').style.display = 'block';
-                } else {
-                    alert('Lỗi: ' + result.error);
-                }
-            } catch (error) {
-                alert('Lỗi kết nối: ' + error.message);
+                const response = await fetch('/transcribe', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showResult(data.transcription, data.model);
+            } catch (err) {
+                alert('Error: ' + err.message);
             } finally {
-                document.getElementById('loadingSpinner').classList.remove('show');
+                loadingOverlay.classList.remove('active');
             }
         }
-        
-        // Copy result
+
+        // UI Helpers
+        function showResult(text, model) {
+            resultText.textContent = text;
+            resultModel.textContent = `Model used: ${model}`;
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideResult() {
+            resultContainer.style.display = 'none';
+        }
+
         function copyResult() {
-            const text = document.getElementById('resultText').textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Đã sao chép vào clipboard!');
-            });
+            navigator.clipboard.writeText(resultText.textContent);
+            const btn = document.querySelector('.copy-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+            setTimeout(() => btn.innerHTML = originalHTML, 2000);
         }
     </script>
 </body>
+
 </html>
